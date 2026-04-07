@@ -1,0 +1,1977 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ระบบส่งยอดขาย Santa Fe</title>
+
+<style>
+:root{
+  --orange:#ff7a00;
+  --bg:#f7e9dd;
+  --card:#fff;
+  --text:#0f172a;
+  --border:rgba(15,23,42,.12);
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:'Sarabun',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
+.header{
+  background:#fff;
+  border-bottom:1px solid var(--border);
+  padding:14px 18px;
+padding-top:6px;padding-bottom:6px;padding-top:0px;padding-bottom:4px;margin-top:-10px;}
+.header-inner{
+  max-width:1200px;
+  margin:0 auto;
+  display:grid;
+  grid-template-columns: 180px 1fr 220px;
+  align-items:center;
+  gap:12px;
+  position:relative;
+}
+.brand-logo{
+  height:134px;
+  width:auto;
+  justify-self:start;
+transform:scale(0.9);}
+.brand-title{
+  font-size:40px;
+  font-weight:800;
+  letter-spacing:.2px;
+  text-align:center;
+  line-height:1.2;
+  position:relative;
+  left:0;
+  margin:0;
+  padding:0;
+}
+.brand-version{position:absolute;top:16px;right:41px;font-size:10px;color:#000;background:none;border:none;padding:0;box-shadow:none;line-height:1;}
+@media(max-width:900px){
+  .header-inner{grid-template-columns: 120px 1fr 170px;}
+  .brand-logo{height:90px}
+  .brand-title{font-size:30px}
+}
+@media(max-width:600px){
+  .header{padding:12px 14px}
+  .header-inner{
+    grid-template-columns: 1fr;
+    justify-items:center;
+    gap:8px;
+  }
+  .brand-logo{height:93px}
+  .brand-title{font-size:28px}
+  .brand-version{justify-self:center}
+
+  .brand-version{right:29px;top:6px;}
+}
+
+.wrap{max-width:1200px;margin:20px auto;padding:0 18px;display:flex;justify-content:center;}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px;width:min(1100px,100%);}
+.section{margin-bottom:22px}
+.section h2{margin:0 0 14px;background:var(--orange);color:#fff;padding:10px 12px;border-radius:12px;font-size:18px;text-align:center;}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+@media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.grid{grid-template-columns:1fr}}
+
+/* spacing between question (label) and input to match reference */
+label{
+  display:block;
+  font-size:14px;
+  font-weight:700;
+  margin:0 0 8px;
+}
+input,select{
+  width:100%;
+  padding:12px 12px;
+  border:1px solid var(--border);
+  border-radius:12px;
+  font-size:14px;
+  background:#fff;
+}
+.hint{font-size:12px;color:#475569;margin-top:8px}
+.actions{text-align:center;margin-top:22px}
+button{
+  background:var(--orange);
+  color:#fff;
+  border:none;
+  border-radius:12px;
+  padding:12px 24px;
+  font-size:16px;
+  font-weight:800;
+  cursor:pointer;
+}
+button:disabled{opacity:.6}
+.status{display:none;margin-top:14px;padding:12px;border-radius:10px;font-size:14px}
+.status.ok{display:block;background:#e7f7ed;color:#15803d}
+.status.err{display:block;background:#fee2e2;color:#b91c1c}
+.footer{text-align:center;margin-top:16px;font-size:12px;color:#ff7a00;font-weight:700}
+.help-text{font-size:12px;color:#64748b;margin-top:6px}
+.field-locked{opacity:.6}
+
+.center-row{
+  display:grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap:16px;
+  justify-items:center;
+}
+.center-row .form-group{
+  width:100%;
+  max-width:320px;
+}
+
+/* ===== Modal Popup (Sweet-like) ===== */
+.modal-backdrop{
+  position:fixed; inset:0;
+  background:rgba(2,6,23,.55);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+  z-index:9999;
+}
+.modal-backdrop.show{display:flex}
+.modal-card{
+  width:min(520px, 100%);
+  background:#fff;
+  border-radius:24px;
+  box-shadow:0 20px 60px rgba(0,0,0,.25);
+  overflow:hidden;
+}
+.modal-body{
+  padding:22px 22px 18px;
+  text-align:center;
+}
+.modal-img{
+  width:120px; height:120px;
+  object-fit:contain;
+  margin:0 auto 4px;
+  display:none;
+}
+.modal-img.is-loading{
+  display:block;
+  animation:pulse 1.1s ease-in-out infinite;
+}
+@keyframes pulse{
+  0%{transform:scale(0.98); opacity:.85}
+  50%{transform:scale(1.03); opacity:1}
+  100%{transform:scale(0.98); opacity:.85}
+}
+.modal-title{
+  font-size:26px;
+  font-weight:900;
+  margin:0 0 10px;
+  letter-spacing:.2px;
+}
+.modal-msg{
+  font-size:16px;
+  line-height:1.45;
+  color:#475569;
+  margin:0;
+  white-space:pre-line;
+}
+.modal-backdrop.modal-spacious .modal-msg{
+  font-size:17px;
+  line-height:1.65;
+}
+.modal-backdrop.modal-spacious .modal-msg > div{
+  margin:6px 0;
+}
+.modal-msg.small{font-size:13px;}
+
+/* Lines rendering (no numbering) */
+.modal-msg .modal-lines{
+  display:inline-block;
+  text-align:center;
+  max-width:100%;
+}
+\.modal-msg .modal-lines > div{
+  font-size:18px;
+  line-height:1.6;
+  margin:0 0 6px;
+  letter-spacing:-0.1px;
+}
+.modal-msg .modal-lines > div.line-red{
+  color:#d32f2f;
+  font-weight:800;
+}
+
+.modal-msg .modal-list{
+  display:inline-block;
+  text-align:left;
+  padding-left:26px;
+  padding-right:18px;
+  margin:0;
+  max-width:100%;
+  list-style-position:outside;
+}
+
+.modal-msg .modal-list li{
+  font-size:18px;
+  line-height:1.6;
+  margin:0 0 10px;
+  white-space:normal;
+  overflow-wrap:anywhere;
+  word-break:break-word;
+}
+
+/* ===== Modal: error conditions list (no scrollbar, 1 item = 1 line) ===== */
+.modal-backdrop.modal-error-nowrap .modal-card{
+  /* keep original popup width; adjust text size instead */
+}
+.modal-backdrop.modal-error-nowrap .modal-body{
+  padding-top:18px; /* move icon+title up a bit */
+}
+.modal-backdrop.modal-error-nowrap .modal-img{
+  margin:0 auto 2px; /* tighter gap under icon */
+}
+.modal-backdrop.modal-error-nowrap .modal-title{
+  margin:0 0 14px; /* add breathing room before list */
+}
+.modal-backdrop.modal-error-nowrap .modal-msg{
+  font-size:14px;
+}
+.modal-backdrop.modal-error-nowrap .modal-msg .modal-list{
+  display:inline-block;
+  text-align:left;
+  padding-left:26px;
+  padding-right:18px;
+  margin:0;
+  max-width:100%;
+  white-space:normal;
+  overflow-wrap:anywhere;
+}
+.modal-backdrop.modal-error-nowrap .modal-msg .modal-list li{
+  white-space:normal;
+  font-size:18px;
+  line-height:1.6;
+  letter-spacing:0;
+  margin:0 0 10px;
+  overflow-wrap:anywhere;
+  word-break:break-word;
+}
+
+/* Mobile: allow wrap so it won't overflow the screen */
+@media(max-width:600px){
+  .modal-backdrop.modal-error-nowrap .modal-card{ width:min(520px, 100%); }
+  .modal-backdrop.modal-error-nowrap .modal-msg .modal-list,
+  .modal-backdrop.modal-error-nowrap .modal-msg .modal-list li{
+    white-space:normal;
+    overflow-wrap:anywhere;
+    word-break:break-word;
+  }
+}
+  .modal-backdrop.modal-error-nowrap .modal-msg{ font-size:15px; }
+  .modal-backdrop.modal-error-nowrap .modal-msg .modal-list li{
+  white-space:nowrap;
+  font-size:14px;     /* start larger; JS will auto-shrink if needed */
+  line-height:1.25;
+  letter-spacing:-0.1px;
+  margin:0 0 6px;
+}
+}
+
+/* ===== Modal: auto spacing when error list has multiple items ===== */ when error list has multiple items ===== */
+.modal-backdrop.modal-error-multi .modal-body{ padding-top:18px; }
+.modal-backdrop.modal-error-multi .modal-img{ margin:0 auto 2px; }
+.modal-backdrop.modal-error-multi .modal-title{ margin:0 0 12px; }
+
+/* On small screens allow wrapping to avoid horizontal scroll */
+@media (max-width:600px){
+  .modal-msg .modal-list, .modal-msg .modal-list li{ white-space:normal !important; }
+}
+
+
+/* ===== Modal (auto spacing when error list is long) ===== */
+.modal-backdrop.modal-error-multi .modal-body{
+  padding-top:20px; /* move content up a bit */
+}
+.modal-backdrop.modal-error-multi .modal-img{
+  margin-bottom:4px;
+}
+.modal-backdrop.modal-error-multi .modal-title{
+  margin-bottom:14px; /* give breathing room from message/list */
+}
+.modal-backdrop.modal-error-multi .modal-msg{
+  font-size:15px;
+}
+.modal-backdrop.modal-error-multi .modal-msg .modal-list li{
+  white-space:normal; /* allow wrap so it doesn't look cramped */
+  line-height:1.35;
+  margin:0 0 8px;
+}
+
+.modal-actions{
+  padding:0 22px 22px;
+}
+.modal-btn{
+  width:100%;
+  border:none;
+  border-radius:18px;
+  padding:14px 16px;
+  font-size:18px;
+  font-weight:900;
+  cursor:pointer;
+  background:#f4e6d8;
+  color:#b45309;
+}
+.modal-loading .modal-btn{display:none}
+.spinner{
+  width:46px;height:46px;
+  border:5px solid rgba(255,122,0,.25);
+  border-top-color: var(--orange);
+  border-radius:999px;
+  margin:4px auto 16px;
+  animation:spin 1s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+
+/* ===== Review (Summary) Overlay ===== */
+.review-card{
+  max-width:900px;
+  width:min(900px,100%);
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:16px;
+  box-shadow:0 12px 30px rgba(0,0,0,.18);
+}
+.review-title{font-size:20px;font-weight:800;margin:0 0 6px;text-align:center}
+.review-sub{font-size:12px;opacity:.85;text-align:center;margin:0 0 12px}
+.review-name{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  justify-content:center;
+  margin:0 0 12px;
+  flex-wrap:wrap;
+}
+.review-name label{
+  font-weight:800;
+  font-size:13px;
+}
+.review-name input{
+  width:min(420px,100%);
+  padding:10px 12px;
+  border-radius:12px;
+  border:1px solid rgba(15,23,42,16);
+  outline:none;
+  font-weight:700;
+  font-family:inherit;
+  font-size:14px;
+}
+.review-name input:focus{
+  border-color: rgba(255,122,0,0.9);
+  box-shadow:0 0 0 3px rgba(255,122,0,0.18);
+}
+.review-section{margin:0 0 14px}
+.review-section-title{
+  margin:0 0 8px;
+  background:var(--orange);
+  color:#fff;
+  font-weight:900;
+  padding:8px 10px;
+  border-radius:12px;
+  text-align:center;
+  font-size:14px;
+}
+.review-table{width:100%;border-collapse:collapse;font-size:14px}
+.review-table th,.review-table td{border:1px solid rgba(15,23,42,.12);padding:8px 10px;vertical-align:top}
+.review-table th{background:#fff7ee;width:34%;font-weight:800}
+.review-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:14px;flex-wrap:wrap}
+.review-actions .btn{
+  border-radius:12px;
+  border:1px solid rgba(15,23,42,.16);
+  padding:10px 14px;
+  font-weight:800;
+  cursor:pointer;
+}
+
+.review-actions button.btn{background:#fff;color:var(--text);}
+
+/* ปุ่มในหน้าสรุปคำตอบ */
+.review-actions #reviewBack{
+  background:#e11d48; /* แดง */
+  color:#fff;
+  border-color:transparent;
+}
+.review-actions #reviewConfirm{
+  background:#16a34a; /* เขียว */
+  color:#fff;
+  border-color:transparent;
+}
+@media(max-width:600px){
+  .review-table th{width:auto}
+  .review-actions{justify-content:center}
+}
+
+
+.modal-backdrop.modal-error-nowrap .modal-msg .modal-list li{
+  white-space:nowrap;
+  font-size:14px;     /* start larger; JS will auto-shrink if needed */
+  line-height:1.25;
+  letter-spacing:-0.1px;
+  margin:0 0 6px;
+}
+@media (max-width:600px){
+  .modal-backdrop.modal-error-nowrap .modal-msg .modal-list li{
+  white-space:nowrap;
+  font-size:14px;     /* start larger; JS will auto-shrink if needed */
+  line-height:1.25;
+  letter-spacing:-0.1px;
+  margin:0 0 6px;
+}
+}
+
+
+/* === MOBILE HEADER FIX v1.3 (TARGET REAL CLASSES) === */
+@media (max-width: 600px){
+
+  /* 1) LOGO: bigger + centered */
+  .brand-logo{
+    display:block !important;
+    margin:0 auto 10px auto !important;
+    height:150px !important;      /* bigger */
+    width:auto !important;
+    transform:scale(1.0) !important; /* cancel 0.9 */
+  }
+  /* ensure container centers */
+  .brand{
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:center !important;
+    justify-content:center !important;
+  }
+
+  /* 2) TITLE: smaller + centered + single line */
+  .brand-title{
+    font-size:26px !important;
+    line-height:1.15 !important;
+    text-align:center !important;
+    left:0 !important;            /* cancel relative left */
+    white-space:nowrap !important;
+    margin-top:6px !important;
+  }
+
+  /* 3) VERSION: move left +25px (from left edge) */
+  .brand-version{
+    left:25px !important;
+    right:auto !important;
+    top:10px !important;
+  }
+}
+
+
+
+/* === PATCH v1: popup condition font + unify button font === */
+.modal-list, .modal-list li{
+  font-size:18px !important;
+  line-height:1.6 !important;
+}
+.modal-list li{ margin:6px 0 !important; }
+
+button{
+  font-family:'Sarabun',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif !important;
+  font-size:18px !important;
+  font-weight:900 !important;
+}
+.modal-btn{
+  font-family:'Sarabun',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif !important;
+  font-size:18px !important;
+  font-weight:900 !important;
+}
+
+
+/* ===== PATCH v3: Fix list text clipping in popups ===== */
+.modal-msg .modal-list{
+  display:block !important;
+  width:100% !important;
+  max-width:100% !important;
+  box-sizing:border-box !important;
+  padding-left:28px !important; /* keep numbering indent */
+  padding-right:12px !important; /* breathing room to avoid right-edge clip */
+  margin:0 auto !important;
+}
+.modal-msg .modal-list li{
+  box-sizing:border-box !important;
+  padding-right:8px !important;
+  white-space:normal !important;
+  overflow-wrap:anywhere !important;
+  word-break:break-word !important;
+}
+
+
+/* ===============================
+   Android only – Header fix
+   =============================== */
+@media screen and (max-width: 480px) {
+
+  .container,
+  .main-container,
+  .card {
+    position: relative;
+  }
+
+  .page-title,
+  .header-title,
+  h1.title {
+    font-size: 16px;
+    line-height: 1.3;
+    max-width: 100%;
+    margin: 0 auto 10px auto;
+    padding: 0 12px;
+    text-align: center;
+    box-sizing: border-box;
+    word-break: break-word;
+    white-space: normal;
+  }
+}
+
+
+/* ===============================
+   ANDROID: tighten title to logo
+   =============================== */
+@media screen and (max-width: 480px) {
+
+  /* ลดช่องว่างระหว่างโลโก้กับหัวข้อ */
+  .header img,
+  .logo {
+    margin-bottom: 4px !important;
+  }
+
+  .header h1,
+  .page-title,
+  .header-title {
+    margin-top: 2px !important;   /* 👈 ชิดโลโก้ขึ้น */
+  }
+}
+
+
+/* ===============================
+   HEADER POSITION PER DEVICE
+   =============================== */
+
+/* ANDROID: ชิดโลโก้มากขึ้น */
+@media screen and (max-width: 480px) and (orientation: portrait) {
+  .header h1,
+  .page-title,
+  .header-title {
+    margin-top: -6px !important; /* ดันขึ้นชิดโลโก้จริง */
+  }
+}
+
+/* DESKTOP: ขยับหัวข้อไปขวา 30px */
+@media screen and (min-width: 1024px) {
+  .header h1,
+  .page-title,
+  .header-title {
+    position: relative;
+    left: 30px;
+  }
+}
+
+/* iOS (iPhone): ขยับหัวข้อไปซ้าย 20px */
+@supports (-webkit-touch-callout: none) {
+  @media screen and (max-width: 480px) {
+    .header h1,
+    .page-title,
+    .header-title {
+      position: relative;
+      left: -20px;
+    }
+  }
+}
+
+
+/* ===============================
+   HEADER: lock to real element (.brand-title)
+   Only moves the title; nothing else.
+   =============================== */
+
+/* Always neutralize the inline margin-left on the title (we will control per device) */
+.brand-title{ margin-left: 0 !important; }
+
+/* ANDROID: tighter to logo + centered inside white header */
+.is-android .brand-title{
+  text-align: center !important;
+}
+@media (max-width: 600px){
+  .is-android .brand-title{
+    transform: translateY(-34px) !important; /* 👈 ชิดโลโก้เพิ่ม */
+    margin-top: 0 !important;
+  }
+}
+
+/* DESKTOP: move title right 30px */
+@media (min-width: 901px){
+  .brand-title{
+    transform: translateX(30px) !important;
+  }
+}
+
+/* iPhone/iOS: move title left 20px */
+@media (max-width: 600px){
+  .is-ios .brand-title{
+    transform: translateX(-20px) translateY(-20px) !important;
+  }
+}
+
+</style>
+
+
+<style>
+#modal .modal-msg, #modal .modal-msg li{font-size:17px;}
+
+/* === MOBILE HEADER FIX v1.3 (TARGET REAL CLASSES) === */
+@media (max-width: 600px){
+
+  /* 1) LOGO: bigger + centered */
+  .brand-logo{
+    display:block !important;
+    margin:0 auto 10px auto !important;
+    height:150px !important;      /* bigger */
+    width:auto !important;
+    transform:scale(1.0) !important; /* cancel 0.9 */
+  }
+  /* ensure container centers */
+  .brand{
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:center !important;
+    justify-content:center !important;
+  }
+
+  /* 2) TITLE: smaller + centered + single line */
+  .brand-title{
+    font-size:26px !important;
+    line-height:1.15 !important;
+    text-align:center !important;
+    left:0 !important;            /* cancel relative left */
+    white-space:nowrap !important;
+    margin-top:6px !important;
+  }
+
+  /* 3) VERSION: move left +25px (from left edge) */
+  .brand-version{
+    left:25px !important;
+    right:auto !important;
+    top:10px !important;
+  }
+}
+
+
+/* ===============================
+   Android only – Header fix
+   =============================== */
+@media screen and (max-width: 480px) {
+
+  .container,
+  .main-container,
+  .card {
+    position: relative;
+  }
+
+  .page-title,
+  .header-title,
+  h1.title {
+    font-size: 16px;
+    line-height: 1.3;
+    max-width: 100%;
+    margin: 0 auto 10px auto;
+    padding: 0 12px;
+    text-align: center;
+    box-sizing: border-box;
+    word-break: break-word;
+    white-space: normal;
+  }
+}
+
+
+/* ===============================
+   ANDROID: tighten title to logo
+   =============================== */
+@media screen and (max-width: 480px) {
+
+  /* ลดช่องว่างระหว่างโลโก้กับหัวข้อ */
+  .header img,
+  .logo {
+    margin-bottom: 4px !important;
+  }
+
+  .header h1,
+  .page-title,
+  .header-title {
+    margin-top: 2px !important;   /* 👈 ชิดโลโก้ขึ้น */
+  }
+}
+
+
+/* ===============================
+   HEADER POSITION PER DEVICE
+   =============================== */
+
+/* ANDROID: ชิดโลโก้มากขึ้น */
+@media screen and (max-width: 480px) and (orientation: portrait) {
+  .header h1,
+  .page-title,
+  .header-title {
+    margin-top: -6px !important; /* ดันขึ้นชิดโลโก้จริง */
+  }
+}
+
+/* DESKTOP: ขยับหัวข้อไปขวา 30px */
+@media screen and (min-width: 1024px) {
+  .header h1,
+  .page-title,
+  .header-title {
+    position: relative;
+    left: 30px;
+  }
+}
+
+/* iOS (iPhone): ขยับหัวข้อไปซ้าย 20px */
+@supports (-webkit-touch-callout: none) {
+  @media screen and (max-width: 480px) {
+    .header h1,
+    .page-title,
+    .header-title {
+      position: relative;
+      left: -20px;
+    }
+  }
+}
+
+</style>
+<script>
+/* === Android detect (for header-only tweaks) === */
+try{
+  if (/Android/i.test(navigator.userAgent||"")) document.documentElement.classList.add("is-android");
+}catch(_){}
+</script>
+
+
+<style>
+/* === ANDROID HEADER FIX v2 (ONLY ANDROID) === */
+@media (max-width: 600px){
+  .is-android .header-inner{ padding-left:0 !important; padding-right:0 !important; }
+  .is-android .brand-title{
+    position:static !important;
+    left:auto !important;
+    margin-left:0 !important;
+    margin-right:0 !important;
+    width:100% !important;
+    max-width:100% !important;
+    box-sizing:border-box !important;
+    padding:0 10px !important;       /* keep inside white panel */
+    text-align:center !important;
+    font-size:22px !important;        /* smaller so it won't overflow */
+    line-height:1.2 !important;
+    white-space:normal !important;    /* allow wrap instead of overflow */
+    overflow-wrap:anywhere !important;
+    word-break:break-word !important;
+    transform:none !important;        /* cancel translateY patches */
+  }
+}
+
+/* ===============================
+   ANDROID: tighten title to logo
+   =============================== */
+@media screen and (max-width: 480px) {
+
+  /* ลดช่องว่างระหว่างโลโก้กับหัวข้อ */
+  .header img,
+  .logo {
+    margin-bottom: 4px !important;
+  }
+
+  .header h1,
+  .page-title,
+  .header-title {
+    margin-top: 2px !important;   /* 👈 ชิดโลโก้ขึ้น */
+  }
+}
+
+
+/* ===============================
+   HEADER POSITION PER DEVICE
+   =============================== */
+
+/* ANDROID: ชิดโลโก้มากขึ้น */
+@media screen and (max-width: 480px) and (orientation: portrait) {
+  .header h1,
+  .page-title,
+  .header-title {
+    margin-top: -6px !important; /* ดันขึ้นชิดโลโก้จริง */
+  }
+}
+
+/* DESKTOP: ขยับหัวข้อไปขวา 30px */
+@media screen and (min-width: 1024px) {
+  .header h1,
+  .page-title,
+  .header-title {
+    position: relative;
+    left: 30px;
+  }
+}
+
+/* iOS (iPhone): ขยับหัวข้อไปซ้าย 20px */
+@supports (-webkit-touch-callout: none) {
+  @media screen and (max-width: 480px) {
+    .header h1,
+    .page-title,
+    .header-title {
+      position: relative;
+      left: -20px;
+    }
+  }
+}
+
+</style>
+
+<style>
+/* === ANDROID ONLY: Header title fit inside white box (do not overflow) === */
+/* Base mobile tweak (Android + others) */
+@media (max-width:600px){
+  .header-inner .brand-title{
+    font-size:24px !important;
+    line-height:1.15 !important;
+    text-align:center !important;
+    max-width:100% !important;
+    padding:0 10px !important;
+    margin:0 auto !important;
+    left:0 !important;
+    white-space:normal !important;
+    overflow-wrap:anywhere !important;
+    word-break:break-word !important;
+  }
+}
+/* iOS override back (so this change is effectively Android-only) */
+@supports (-webkit-touch-callout: none){
+  @media (max-width:600px){
+    .header-inner .brand-title{
+      font-size:28px !important;
+      line-height:1.15 !important;
+      padding:0 6px !important;
+      white-space:nowrap !important;
+      overflow-wrap:normal !important;
+      word-break:normal !important;
+    }
+  }
+}
+
+/* ===============================
+   ANDROID: tighten title to logo
+   =============================== */
+@media screen and (max-width: 480px) {
+
+  /* ลดช่องว่างระหว่างโลโก้กับหัวข้อ */
+  .header img,
+  .logo {
+    margin-bottom: 4px !important;
+  }
+
+  .header h1,
+  .page-title,
+  .header-title {
+    margin-top: 2px !important;   /* 👈 ชิดโลโก้ขึ้น */
+  }
+}
+
+
+/* ===============================
+   HEADER POSITION PER DEVICE
+   =============================== */
+
+/* ANDROID: ชิดโลโก้มากขึ้น */
+@media screen and (max-width: 480px) and (orientation: portrait) {
+  .header h1,
+  .page-title,
+  .header-title {
+    margin-top: -6px !important; /* ดันขึ้นชิดโลโก้จริง */
+  }
+}
+
+/* DESKTOP: ขยับหัวข้อไปขวา 30px */
+@media screen and (min-width: 1024px) {
+  .header h1,
+  .page-title,
+  .header-title {
+    position: relative;
+    left: 30px;
+  }
+}
+
+/* iOS (iPhone): ขยับหัวข้อไปซ้าย 20px */
+@supports (-webkit-touch-callout: none) {
+  @media screen and (max-width: 480px) {
+    .header h1,
+    .page-title,
+    .header-title {
+      position: relative;
+      left: -20px;
+    }
+  }
+}
+
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+
+<div class="header">
+  <div class="header-inner">
+    <img class="brand-logo" alt="Santa Fe" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAcMAAAC4CAMAAACoyndaAAADAFBMVEX/awD/YQD/////////bAD/YgD/ZgBHcEz/agD/aAD///z///z9////+/P//fj/9uf/////+fH//vz///7/+e//cx7/y6D/xZj/4ML/4cP/zaT+4cP/wZr+gx//mkz/5cz/5Mj+jzL/4MH/z6D/4cX/eRn/y5z/16z/n1j+377/+/L/kzz/48j/wZT/tIH/6tX///////3/jzf+jjL/0Kn+nlb/axr/eBn/xZz/+vH/cRr/zKT+qGr+mEr/38D/0qP/6dL/5Mz/7Nf/69b/8uT/kDv/xZ3/4sb+rHD/zKT+rnT/oFj+rG//1q3/0Kr/iR7/+fL/vpP+iSP+rXD/v5L/vI//27n/wJb/+vH+pWT+q2//toH/aRL/sHr+nlb/2rT+hST/x6D+gSb+xZT+nFL/ghj/w5D/aQ//zqj/yaH+p2n/vpL/uoz+xJf/uIX+tH7/sXn+pWf+u4n/sYD/1bD/vZP+nFT+ji7/zqf/xJ3/qGf+n1n/2rn/dRX/uIb+ol7/06P+nlb/p2T+sHb/gBj/tIP/exj/iyn+jSb+lED/0ar/w5X/+vT+o2H/2Lb+v43/lD3/4ML/snv+ahT+tH3+u4z+fx7+iyb+mEr+pF7/cRn/9er+sXf/wZj+o2H+wpT/7d7+eyH/u4j/rnb+fB7+uYb/o2D+kTv/l0P/rXT+iSb/fx//xZz+qm//4MH/w5T/iSj/dR7+oV3/cAf/pmr/Zgv/v4/+sXb/38L/0a//pGD/2rz+YhD/y6P/sHr/xJH/vpL/9Or/jTP//fn+kC7/0q//nVT+zq3/XQb+qHH+lEf/4sj+hBv+yKP/+vP/4sX/+vP/VRf/tnz/+vL/9O3/w5v93b7/ZQD/YQD/ZgH/YgD/WwD/XQD/YwD/Ywb/bA7/XwD/exj/ZhT/YwT/aBD/aBz/YAn/Zwn/WAD/YRD/YAH/Zgz/bBb/ZAr/ZBD/XgT/dhj/cx//cRH/aRX/bR7/cBz/dx//hR7/cRb/fCD/XRH/l0L/gSX/eSj/olz/WgrQ2mzrAAAA13RSTlP+/gIH/v7+AP7+ARYEGxEfCBQKDCb8T0cxQVYrjvr2NSXtPEpF9DtF9x8h9UlApjoFDuficvP5+HM19ZLY7DhARE4ZLivsY1bIatH98kum+kTw7sLC6FCDML/jwPGa7VbzfPkq3vc29YqEqfaTaoDNt1LPoGB6wfucp9DSZ/uKtjHm6a30sP798+JcXT3LfKb8YOr94XPq5tr47krazpieP/udd/C348/4kNTzmIJwtPjk2f1b/FTBtZbwiui0ZiLgU8Js9cf94vpKrszh2F+fz/z4rof86Vl9c4UAAB0tSURBVHja7Jp9UBNnHsezkH2ymwRCIKAgIihIBzghSk+sqFhUDpTaQQdaLC9ae4VOX65oq1TRim3hcESxtdarVbS+4Onpjderp1dv7mb4q3cz/pl1k5DIq92AEN6Zg5vbzcvusyFJvUGcS+b5zghO2OzL7/P8nuf3+z4rkSH5uiQoBIghEmKIhBgiIYaIIRJiiIQYIiGGiCESYoiEGCIhhoghEmKIhBgiIYaIIRJiiIQYIiGGiCESYoiEGCIhhoghEmKIhBgiIYaIIRJiiIQYIiGGiCESYoiEGCIhhoghEmL4bKXUpOTk5KxllRKfEh+rRAx9T5qtp//j0MaNGz+ahxjOWGmqyIaMoujo6KLtuWWpCvmsXzCrtLu/zan+83MQw5lJrtldfaZlbGKE0+hY3d2qvWVBs83weQYDThmWz4hhdsX16urq69Gcij6wqagoGlbRolC/ZqhsvpM52fWYYTCcE8Ywbe3DdXkVqbO6RqU83wYkDhF0wi9mMgTTp7o4DXd51ocqf2aYdKfW2sfgAJCEI6IkALj58eihlQueGcPlM2Go3F6jx3l1cD8ALpLedCDQjxk2V011Y4CQiCSVkADrtl6uVPlCHiorHtISqReRdEGi/66HATnFw3rAMnOVVCphKU69l5P2/88wbeVDipB4EW46rPVfhjm1QwZS6v7JpQQwmGIq1LNV0zy1uTTkZxiS9I4o/61LV5zpNXh5eimJMXXn1M+C4Uzq0tC9DzFvDHWWj1R+y1B9c9hMSrwK18/SGH6KDMO8MyQYa6XSbxnu3qMH3hFKgH6WyoFnxxC0lWb5bY+v2DqEiwYsyfXbJBwO0nA+OmxWLh5Z+tQYal/yyhAfOqf1W4Y5Lf1wGpJGqs1i6aBowM+vBDZ+WDE7F08tfWo1TbCYIUHCYguz+hS/9dqUd0bhRwfM5+U7MzO/KrB2UrgjGfGefdluGhLF3MSIqCNHoiLmzFUF/9xSE6KJb8jNzchtiE9K88gwYY3n9kednRjVsCF3w5GoxLmqMDdOrlrM0LW//2mbcxhq1yVGbcjNzW3Iz1bL/YKheuuQTgoV4AklkbFBQarFGa+Wm1iKXEFniMufRn5e7rG80s0To1br6MT85Mt51ZVR2c65Spuzn1NTWVlZYf5q7lNFTvWZmMlR9tjJljPVOcHuGRprVhYmFhaWlTU17W9qKhRm7wDN7r1Vta1jE9wZxvbcLd5a3Vi2LnQaQ6i3AMSYWMcbA2yrZmrjzeJk+63sqf3mTlaIHzDUFD8GPEMCH19iH65ymWr37XITAyTAcO2dAJcyPvHCoYmRx90UzYqiKaavc2R086FtlYU2jzzy9L95Hd+3QKZMvdlifdzPUJwNa7ZYk4+lBrhhyMa97jgrxzczY53jJXXlmbqBoW6GvRzGXo/ptvSOTLacuNeYGuopD0nmjXv37//Frn9yur8iQM6NpUMTvX0MQ2EYxt527+SmvRrfZ7gAjiJJtRZC1U7UlvOU2RB+wMWlWXCsfrzNbPNWCULC/uOsVYxp651Ifi+dDevigkd6g0OPfshXpF8eMWAA2A8mAWawZq51x5CdyM1ms/17+u6DjmxNqqidsBgwHXw1HXs5y0DdpmpojleIGNLLmsNCg9VqtUIRFJSk0SRpAwNCXr4XM8DdOHsmie1WcHPfZNXLPs9wYTIjWDSAWiVyuIMylnUO/0a8ARXGItFjbMUjlQrGqq2c1WGGzriP2ajnWXBnMYH/sL+xoMcM+KOlEs742RnpjqGEr0GAIfwd+3yQtW2yz6wjJcLlpNz/CAAwc9/UdWEqDBIxpJbNnWYC3PhiguFMYf5WpBJSpx/+otnXGUa2UgJDkoqLFP1VvrpkizgY6ut/7DO79Va5wOqvLWbrl+hx3Ok+P3jtdr0eI8SHk4bOLUHuGPL+NGjbadvTD7tRO27QERJ3RiBBYj99qvWQh1Tcatfe468xJjOY1n2Q+q6tGh9nuDgOYkjQNW+7NIJpYpMt+NykHvfYhhE0x1AWNZ92NiYk8fDB9ONJQ3hGgGt/CJ8HGzzHrXUhN2IsmEcDQgral4TCDCmY4UIXhBV7+t3ZUVJSP1UR6NsMs1d1AKguZXYUeWsFAysn9TovhhZ9kWOYvVMgQ+qAu+h371O5+jSwqWKuL7Nl4d1uLzYgy7AkzRPDpeI8VN5IfgS1HtzSyp+lr3iFbzMMyuwDIlfNervB8xsYu1v1QifCLYFGAE9PjjzUHoOsH0L0y/khdT7KC0PctI29B/k/TrSbobjbrgYZSGKG4rqUWireum6+3I0JD2mkaaMwyqjJRrlPM9ReagdSUQp07vioMjLY7cHr8iwY5OgYewZ7TTodFGZ6vs1XzR0VbwNx4TfCsKX40Ntc+Ne6ZUgyk+lsVNX3rMJ+CgGMD0y9ph4h9hzDXWnu+0PXmkZxqcss1KwPxhOujQsnwkbuaX2aobxyhBLvF+ooi7X1dtGa6RiVK61mCKHpXz9evfrWlRrIlaPnL+IOTKyn4P1I0qgzvfBmj5GEwt93VDGNIeF4OcrcU/wKe2dNLXp+eBE64/IrJX+4+uFFkoQZBj4Zw9wdBn6Fpk1X3l205t1TtPPKeG9Vkm/7pfkFrvu/BMCYztHk2xnzXHr77EP9fFBJ4/jZ19kIKl88++cHrgznrocZkrjp99/O+e7HQSFjpWwDN8+VIUHqHC8pTr3EJkbSN0NC0uvoU39Ts0mnPfkZTfzPDBWv9uh4G+Pzs5x7kJax3Hki0HniFd9mGLykE5teVOgwxjSx6kIiXLHJt49ggqNjOmivWOXfvalzZThvPQ0Vu9jgwVh2NKgOmiA3gf5ytQtDAvwp+bRNz1V9zU6lOXuEeoakCr6330TUGxTEcEkg7Hl7ZNiwgyGd32nbx7YS8gBZ83rnZ8CyKcu3GcoS4/Rgev9FANzcMVC/JFLIRdUtofwB1CmnQS1mmG9nCOUh6PnKHs/0CUaYdY02g1v0Po3xd0dSF0bGx6dEBinZEvh6Ly6UQAMHlG4ZCj1+8F6PDNWXBvn+hgrfrpTJWYZrk3mGPT7PMKQoXO+2gGfnVGp8fQa/3uef54NE0INXlU/GkMAffuDc5WIgYC/MYdNBzPDL12VCgaja180PLdCxyokkwmMeujCEeosFbP/EbwXfYhsJuVwW2sg/DTuXrvBxhrLgkmEPO/ksRUP4LkfDGHCgne8rSKqc3yd63/tcStKbE+0HZpX2QRtNHEPZ2udghgm/hu5qTTlF8sNg8Jgz4RZ98mQM4f5wzif8qfChc2Gcoy/7OtMi1DR/1/g6Q5miJNyT+UIAfddb9n5RfRSaSnt2qrwwjF0qMATGZIdlki2EzclQnIcJi6HFN2OEFqbS0Q0QD5ih0FtoxQwh01D+fY2zfGHPlG574v2Z7Xw3iY37eG9hH8NF5RYGuHdECEPXLtsjro4TljPd4KdhT8qwI8aREpq8TleGWR4Zhh7u5U8L6GTeOVskmkuh/lB7B2JIGGsOR3wc69ia/nbQ6GRIjzWFaJr332y1YHyzYajz8R7f4aFFHA3voXFAuDUUw08qbSWJsBwaB07y333/NZhhxHSGzrUs6VcmmCFHO1LMEHoXQ7GvB8r6W3zWR3hkuPIzyFgg8PZfXvztlgvbN/yXvXMPauJaAziEZDcbQoAQXoI3EVBA0CZCQfFVooOKl9EiIpRyVVSuIiqtwFXwgVpUfNRpqWjrSG99XCr4onXaWzvja9QZnf6fvUsiEQJoXqABi05x7m5Ids8muwj3DrE4+f4A2Sxn4/nlfOd7HoKi4nPJ5yLY/mMr8vaON+qpQJKn7tNRdi1c1TPjnVbe1IqhKgaMkPpENFFz1AfYiUD5EgPDWDpDW1uhz7KhGWLgOpQlUIEUqLVEAb/JpgmgMfRAIAxtNxv7XiyJi9tPxQUQpN9ofqTnAYGCJ3cvC98Nhjik4AuNyUwYcQdvqgKWnKZsfQRbVzgEQ8GwGbLr0qpMjNLcxjPkegv6jMW3cGBoxQipeKheqwcCRB4Ij0heA6XDTwZmiuB3hSEuyp/qG5MtKOZAEWqvmQPPuEUFshHNwSqYeT9kWochjAyDhmRYeI6aeY1xF7lh0e3Saoqh2InhYE6TSCnTPpFgMhLxbBn41ht+lxgS1mfwhZpAA0rzNRD05SJ46XKdimI4gWy7FgyboS+NYWAQPFTPTOE3ZEwNZ1gGM9ul1eIhGdrT9cypKy5fpdbdnTn6CF3ejy+AYw/nBqppEHk9x4S3v6SsSpyh7P9dh1aGNP+Qth8WfqMBGB4fMUM+Qiw4Nn7WkhAeahhYWBoAv3sMCYyKskwtCJH3fIvo9peG/5WhlJEhkUBcEMOqS1kYRg6PIR9CNRoVhCB8PkMRBwThFk9nR8HCRB+XTOhbORdDvroABXYR3LiffPsrcB1mriHvffCxU6wtNoHJP3wTQ2zkDKey7Id86Md1E5PazI80hNDS1BoMN1gNbb1NleEZ3i6azrdztolkiw4sGuzaM2/ppxZqP8Q+K2RhGMnA0Oag+y4cwTqsojHcTKoI1lib33qAIYKdGDc3+Malh3cam5s/7kIAuH9POVdXk3shba6PwGWzOeoMBdLpK502BdH2fiD6RjA8kgUw1Oxn8w+ZGIayMkxlZbimmbJpVMZ8L2bfAvDxHRg2Dq4xP5H/zeA7QLjAsCyj6qbSz7UrYtQZ+uYFxl1Z4BAx9L9ipDH81/ycLCPA6vEm8laG/KEDwyg2hoIPrptYGN78jfItIEOuXesJ6LmnfMo7F9MZJlAbNnyJjLV5QKbKybDA1Vpt9PsPC55oe+LOlyrBizmzugBdqmpN95VsB+I0vOeUFrvBwHDa8BjC7+3tYvEtYhMAhu01ZDawlJUh2MttKxOwyeGdJEM+WrDS9TvTqPcfXrF4EonCJRXh0SRG/4vfYYAhwOs/rxCtfwFUhnVV2iOYnEu1b2Jo06WT050Y0sPgOw9TCt63hipqRLBksg05cTyLLmVnKJhC5Z64PMsZr3eOYersboiLO0v61sdXK4rTMkIjIkJLz4/HwFol9HG43O/yH3ogt9MUaQ/R7QaX0qBdKps2jP3wEPHL1ZSCxlf7PnJfDti8DoiQ8Vqn2nS9/GIPNlKGcNUEciwu1D2NXj0smeQ/1hkKZ/bpbU4TD2vtf3ng+5iY73/vpwVqEP2BRFhohU3Nd5HYlpw7hyGO/iGYA6YYOvgWBEPB8X4NUGOzyrbLBgTtDgSKEPFXMm0LcT6QzhiKIa0Ww6cC2Bh4lhKgis1nR3rzZvEYZyihimQQHCOK6tsfoSiPFmKETHs/gAWSLUCXG4KmHLfOX2RCO1CZho63zrWMkaE3jeEz651TJgI6W4Vmbpjv4ystLSnQ0aN9qq5K6yDe+bUorb6UxT+kM5R/20MZaIhnX4mtSEjx3udbDpifnJw3xhkuGqBFqGzd+A55ix6il1283oIBS0ObUh9cGLy5rpsHKt0/FhGrS8Zo0zAxVDaCSQWV9tme9FmzX+j0Kse3YKhZETw3rbxWCxaptp1XsPgW9DrvlQeBiAWitcwuHpeRXbo+628vdVqeNnC1YEwz9P7ZDHHfdCoGOtu6CLIPgpWoCKoLnBho1NLaL3jPLgqd1+EQDOVFBlqrANppMKCoc0kBn9duTE7uNWEITT/8QKlFrw37WXtmvEtawU8aT298eeAfv7+wdBJPggzpk8c0w+hVemRohkQef7XVhPfJ0/FopTaYBtPQZxvSVfjA9Lo2iiFDzBu3+wP19FOpIAhiTD8QTRIY5NC10ZQxLIbwoVVqGnweRvQCD9YtIPqrO8YyQ8HmNuwNyxBRd+TZ/IjsVWqHSeQPpuiAqvzMSawMfZkYKss7aYqA60HPPdCfNtgO50EF4YpJo8Zr/RAMFWeMWoe4NzEM11YTleU/hhnK680tEHOLJtkIZamwN8oGHOvVMpW+gYbpTsK0DBk+Qzj4XAuLJuBrMIYliWggIIBDnd/lN3Oo/kNJpUnLZz1+6P2osaxLJ5UHmojqEi7LgXuqlr50qtdZetTkdI4P37N1CRCPbCXCYg4MbSfD0Gui7AyFZ5MYIXIRde2E506Pg9B1P5JkcW8kmrRLf2GrTRzUITWdWj6XZbPomT6m7VLlpvJki57Y27l0kFwuvjlpTd9VA0VfggzHmeDytZ1rt6VoyENCNQfxWZ0ThzO0t2XTGNqvemjsDGHxhSSngzeJQzdbkuq/qOii9YHjo7U0H7urQchR+lfYbUrxtsdkBzkXwRwZcrJPWoidwOk5CKQ1X00b4/FSUVB+Qm8bUQuF0PLguLNoevZDIi3Hxjm0Fp8JBNCjal3DF7frWni2tjOVun+6EI6IIy9AnmqS4TKDljy8uyUpknwDu1K69TStiT9cb6o7K5IvSOjWAu8K4bU0l536yEQO42k6ai9oUmzrUavs13ktjgxx5VAU2O1QRGs9GsM8kH5ZNMYZEvHNtH0JKRYDRiRMVar/qPBvGGbqKDiaKHO89Z8lAyYUsxNDW3pzI0S397x6apdXHXkSnOGrp2b7hackw587gPvIdYhvZZtO9nZiGpyA1TvFLVDUnLI7GnfEOZENFjVq/zxotOYTm3xzTne8Mpttw7/KtBdnBfwyQFxuw4V4cZoTQ4H/9JPPcMdFYx0LsT5Hb+5dlbdj1M/EdE0OWB4btGt3Y11KUq1F11ZbW5vUdOJocbYPQ5rGO/Fok9FiMKFou8HSNztcwvE68u8PcVlOfNm48cN7RwQz7m3E/zH488aN9+bbfvPXW8sHhbj7NOiEy8rK65IsOlO7pt1k0FlSfisaZ1sa0q3T+ogX0HaTzlK3L1sh9v789HK73Lp12h5kEaZur66eujU/fyv+ZevWMiafL2x1bib+GHw4jBjOmHxiYXi0aPRn10V5fAFxBMaawgefXLt27ZMHD6YUylj/b/7RZVNzK2sSTlZUrw5VwAKO2HfGEUKWEnJEouAE5Cw9dcr60yn8u/2ENo5CkpMzgxD83hkS+slFAWt+ulT/8M6dOw/rL92YEgvk50PSiovKGxobyovKokUC6+MGR8ElJ4c6/k3gJRZ7yYVCoVwulHsJmWMv+GPO1u8ub2jAh7twPKhK5JLJdW0txjCjTgKFMlYW602l/wUjCFcx30tcFIoDxF4c57fhJ1IqlSI/54FGHiQjfkeuEPmLAuSum1X33+x6ex9VN0O3uBm6GbrFzdAtboZucTN0M3SLm6Fb3Azd8mdnKJdGzVEIYFg5J0pqjzhyfKRR8eRf1pbHhoVIpWG2F4VhEVFRoRG22KZ/aGq8L36jSBofH0YV23OUVXPnhiiJUJs4TDpHisucCBkROJWHxIeG4gNI7VVsQl98PJk9WOYVkpoq9RMo5kVFhcjdDIcp0dfvf73BC5Zv+/r+XxNt18LSYxYvnmWv6py09v2YmJjrW0qtweuwrxbjEvPRduJlTvjrxa+zJLD81+v3X2eRTZyy4rUTliz5y/n/tne2QVGUcQCfxbnd4eB4kSMsHBKsDJDwjBDpGBxAE70yySReyhSzYFSIqZww36ChGMdUJCXED4ox04vly1xNaWqhwocwrcyLZ7tb4W7vucO7hfNAYqprn71dXqYPnTN9qOb/+7Z7d7sz+7v//3l29/88Dxkv8Ebtg34uFZOxi9Nqyc+XXvoyX/6utlrcbFeWAFhZu/SP83nM3sall/QzwGGALPLim1VhTNghGx5UhgYuGhb6hEHlhXhKurglmC1rNpLISEgW+sTN/uHN5DVU4TBGF2Yz2qZefGtsqqKcoiEzizCeG0um2/NiZ5/Z3CfgeQ8oB0MsHlXONVs8nuBVhu2kDWO+PXfO7mHse00HDgNkgw1bqkKYkEMOPCBf14iHLNx1yl0h58aUUlbldgsIHSXzuq1MRpTK7UDoFqnwvzsL4aFyZu8ehJ9XxsKod6ZjytHr8BWsE3NnYfqog6JpwTF6okxyyKp4h+PqVWV6jLRBVkXxa+WgW30D87vmZxcgfDQG2sPA4xB5SkIY3YpeNLDVv2taQ5+Kpp3xcjJNyUSeJSsazKyVjINZuYfj3lxRN8+Jnt8uKpo+gFx67aOD2FKntKZTPrAKxtqLnctbxThUx549W7FF1bP/2fUvkzCOyWTtj3R3di4/7f+H6Krc5FyH5UqAtBuseVvHNjtObwsCh3fg0NK6997Hqt2s7FC9+ld06ridG16t5FI0UJiXtow17xCjZfYezvnwwZDqERRNIiW2wYTWnN7lmrAy5pxjRrSvuqPj8kEpuaqZ7GWcuVnrdxaTiYxNP1y5cuWy3PR+i+ybTnE314cqDvmii/dj17YwBhwGnEu9zuDbcY/E3VZRskNdiRXtr85kLU/pxhy+OnVBMjI/lytmz2SOezg16KsbfofqjSN4X9P9yDphkeW7MjE1r+adsQqK7GWs0Jzo/3+kZLLG+KbGxk6/w6D8dLzl+2Wc0DxDcWjcsbCLLciGe4vAyfD2BLMYIzZYJbeHsQ2C8M13B1hT/PYxh7svf3wY9S/RkFpFjiv4ZIHegj6SPp4210l5fmaPjpdFMZF1Qwi71lQpVTaziEO5WCmlxUR3dXVdbfpa2gxfzLNrfjLYkTT8TXRY76RPBXOWykhweCcOTcHGF8+UGmnF4c5o5DnSoee5ev8Qwph01h733m0KR29QS4tKUVtqszyIf01KdxFHPNR1yjIp9yUdKbBiPPKU3FGZKTpUOi0pmSb61LzMluqD0uaq44h68ErnCGv1LxWUXy9+TFN9WQng8E4csvbms+t2nuyX28OoKivnqXn/pIuyFEnX9a70HrrPjLCtIke6tzDRtFlArv1y5D1+oYemDudPOuiUWQ8dFbC8VhcTM8kha9yclp/2ozRlc+j0Ec4Vt9zgoUwLpZlvFtWzrqxkgSVdZXAYuEPkqdIxUSt62YH1ZEdCvJP+xW41quiet7P9Dk30i6UtH7ZJ+Y04NJaWntg2U+44aqpvcvb2idWJUanztU9+OoDcx9Rj7eHa2LFOrrWyo+PHHzpIhyd8l52+brbaf6F7ohfJDvn2iycQ+r0Q+qV35PD9EGaq4jD0pUFR2ZkzZ4y0qT6DSPhsCI0c216W47+odyc7nd/uLDs31oWJeGKItVZOnGhrVuPT3d3PWThHm9Kn4YQdcu3oAy2sMe788mvXOvOkVGqiXaXkXLS7KkzKpaz55OW2fYiNnwUOA2W1DVtLNEwYuccnDpNaeVTaVnaurMKN7NJQpAwbHhmfoOu+ZIQKJi6iFTr9Ju6f5DCldLS3l6dQuryORfYLCGXljj0woLocjtHRk1qyjvgIFppjzpXVeVh0nDxvyxjAwuZnwtf2Yb4oEhwGHIc+r+hQd8jmGyQOszfx/H4y+9c90T5+0yqyApHXNzjuMCHe4bgwMUbUhV6fbZLDdS2kn8vbihJlh8d5viFWiUO+n+d53+hiscE7aHD7bO+Kd5BvvMX7vOVi0Gf87httf0Zd/pu4vUENDgNCndBa25qmY0K/aDRUkpG4sa2G4iOk85JbWVxcIgacetWS4qrxwIvcWlS0ddIcRis/r1lcPnE+ipyKAwUFB3ZtVB5aJ5YUF6+XoyqxTl9To9frW8unMMyCboNhCXkapP3UYGh6RbzNn91k+L47idG+3mjQb5gKDgMjNCkvfIr4jw/JzQ0hLV5QuDZ8qlSorQnXhJE9c3I0ugkhERqlm/xWaE5kTuTkyx2VWFZ2bnyx86AcbZJyBLVOo9GEi5AuTUReamoeKfkOCrk3NY+cNUIr7gllgsLycmdEQRz+AzH6j/34b4/010p99b/0osB7/P8+4BAcAuAQAIcAOASHADgEwCEADsEhAA4BcAiAQ3AIgEMAHALgEBwC4BAAhwA4BIcAOATAIQAOwSEADgFwCIBDcAiAQwAcAuAQHALgEACHADgEhwA4BMAhAA7BIQAOAXAIgENwCIBDABwC4BAcAuAQAIcAOASHADgEwCEADv/f/Ak1W0JuQ8j4HAAAAABJRU5ErkJggg==">
+    <div class="brand-title">ระบบส่งยอดขาย (Sales Report)</div>
+    <div class="brand-version">Version 1.6.0 (7.4.2026)</div>
+  </div>
+</div>
+
+<div class="wrap">
+<div class="panel">
+<form id="salesForm">
+
+<!-- ================= ส่วนที่ 1 ================= -->
+<div class="section">
+  <h2>ส่วนที่ 1: ข้อมูลทั่วไป</h2>
+  <div class="grid">
+    <div>
+      <label>1.1 ผู้จัดการเขตที่รับผิดชอบ</label>
+      <select id="district_manager" required></select>
+    </div>
+    <div>
+      <label>1.2 สาขา</label>
+      <select id="branch" required disabled></select>
+    </div>
+    <div>
+      <label>1.3 วันที่ส่งข้อมูล</label>
+      <input type="date" id="submit_date" required>
+    </div>
+    <div>
+      <label>1.4 ช่วงเวลาที่ทำการส่งข้อมูล</label>
+      <select id="submit_time_slot" required></select>
+    </div>
+  </div>
+</div>
+
+<!-- ================= ส่วนที่ 2 ================= -->
+<div class="section">
+  <h2>ส่วนที่ 2: Sale</h2>
+  <div class="grid">
+    <div><label>2.1 Plan Sale</label><input id="plan_sale" type="text" inputmode="decimal" required placeholder="0.00"></div>
+    <div><label>2.2 Actual Sale</label><input id="actual_sale" type="text" inputmode="decimal" required placeholder="0.00"></div>
+    <div data-lock16><label>2.3 Dine In</label><input id="sale_dine_in" type="text" inputmode="decimal" required placeholder="0.00"></div>
+    <div data-lock16><label>2.4 Take away</label><input id="sale_take_away" type="text" inputmode="decimal" placeholder="0.00"></div>
+    <div data-lock16><label>2.5 Grab</label><input id="sale_grab" type="text" inputmode="decimal" placeholder="0.00"></div>
+    <div data-lock16><label>2.6 Line Man</label><input id="sale_lineman" type="text" inputmode="decimal" placeholder="0.00"></div>
+    <div data-lock16><label>2.7 Shopee Food</label><input id="sale_shopeefood" type="text" inputmode="decimal" placeholder="0.00"></div>
+  </div>
+</div>
+
+<!-- ================= ส่วนที่ 3 ================= -->
+<div class="section">
+  <h2>ส่วนที่ 3: Trans</h2>
+  <div class="grid">
+    <div data-lock16><label>3.1 Total Trans</label><input id="total_trans" type="text" inputmode="decimal" required placeholder="0.00"></div>
+    <div data-lock16><label>3.2 Dine In</label><input id="trans_dine_in" type="text" inputmode="decimal" required placeholder="0.00"></div>
+    <div data-lock16><label>3.3 Take away</label><input id="trans_take_away" type="text" inputmode="decimal" placeholder="0.00"></div>
+    <div data-lock16><label>3.4 Grab</label><input id="trans_grab" type="text" inputmode="decimal" placeholder="0.00"></div>
+    <div data-lock16><label>3.5 Line Man</label><input id="trans_lineman" type="text" inputmode="decimal" placeholder="0.00"></div>
+    <div data-lock16><label>3.6 Shopee Food</label><input id="trans_shopeefood" type="text" inputmode="decimal" placeholder="0.00"></div>
+  </div>
+</div>
+
+<!-- ================= ส่วนที่ 4 ================= -->
+<div class="section">
+  <h2>ส่วนที่ 4: Customer &amp; Labour</h2>
+  <div class="grid">
+    <div data-lock16><label>4.1 Customer</label><input id="customer" type="text" inputmode="decimal" required placeholder="0.00"></div>
+    <div data-lock16><label>4.2 Labour (hour)</label><input id="labour_hour" type="text" inputmode="decimal" required placeholder="0.00"></div>
+    <div data-lock16><label>4.3 Labour (Baht)</label><input id="labour_baht" type="text" inputmode="decimal" required placeholder="0.00"></div>
+  </div>
+  <div class="help-text">ช่วงเวลา 16.00 กรอกเฉพาะ 2.1 Plan Sale และ 2.2 Actual Sale เท่านั้น</div>
+</div>
+
+<div class="actions">
+  <button type="submit" id="btnSubmit">ตรวจสอบข้อมูล</button>
+</div>
+
+<div id="status" class="status"></div>
+<div class="footer">Prepared by Operations Department, FAB Food Holding</div>
+
+</form>
+</div>
+</div>
+
+
+
+<!-- ===== Review Summary (ก่อนยืนยันส่ง) ===== -->
+<div id="reviewOverlay" class="modal-backdrop" aria-hidden="true" style="display:none">
+  <div class="review-card" role="dialog" aria-modal="true" aria-labelledby="reviewTitle">
+    <div class="review-title" id="reviewTitle">สรุปคำตอบก่อนยืนยันส่ง</div>
+    <div class="review-sub">ตรวจสอบความถูกต้อง แล้วกด “ยืนยันและส่งข้อมูล” หรือ “กลับไปแก้ไข”</div>
+    
+      <div class="review-name">
+        <label for="reviewReporter">ชื่อผู้ลงข้อมูล</label>
+        <input id="reviewReporter" type="text" placeholder="พิมพ์ชื่อ">
+      </div>
+<div class="review-body" style="max-height:60vh;overflow:auto">
+      <div id="reviewContent"></div>
+    </div>
+    <div class="review-actions">
+      <button type="button" class="btn btn-secondary" id="reviewBack">กลับไปแก้ไข</button>
+      <button type="button" class="btn btn-primary" id="reviewConfirm">ยืนยันและส่งข้อมูล</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Popup Modal ===== -->
+<div id="modal" class="modal-backdrop" aria-hidden="true">
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-body">
+      <div id="modalSpinner" class="spinner" style="display:none"></div>
+      <img id="modalImg" class="modal-img" alt="">
+      <div id="modalTitle" class="modal-title"></div>
+      <div id="modalMsg" class="modal-msg"></div>
+    </div>
+    <div class="modal-actions">
+      <button id="modalBtn" type="button" class="modal-btn">ตกลง</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzG9r0gnu6Pg64Upo3dbYOnZ-jWcJ0RzLgbad1cyR32SRqTc14P33a76tjtFcf4SQHjsw/exec";
+const APP_VERSION = "1.6.0 (7.4.2026)";
+const DM_OPTIONS = ['นิรุต เจริญศิลป์ (พี่รุต)', 'นพชัย จันทร์รุ่ง (พี่นพ)', 'พัทธดนย์ วัฒนายุทธ (พี่ปิ๊ก)', 'สีวิกา สังข์ด้วง (พี่เจี๊ยบ)', 'อนุรักษ์ สอนภักดี (พี่เอ็ม)', 'ศุกร์แสง วัฒนาฟุ้งเจริญ (พี่หยี)', 'ณธวรรท  ศิริเมธานณ (พี่บิ๊ก)'];
+const BRANCH_OPTIONS = ['5001 แฟชั่น ไอส์แลนด์', '5002 ซีคอนสแควร์ ศรีนครินทร์', '5003 เดอะมอลล์ ท่าพระ', '5004 เซ็นทรัล รัตนาธิเบศร์', '5005 เดอะมอลล์ บางกะปิ', '5007 เซ็นทรัลพลาซา พระราม 2', '5010 แพชชั่น ระยอง', '5011 เดอะมอลล์ งามวงศ์วาน', '5012 โลตัส บางพลี', '5014 บิ๊กซี พัทยากลาง', '5015 แปซิฟิกพาร์ค ศรีราชา', '5016 อิมพีเรียลเวิลด์ สำโรง', '5017 ซีคอน บางแค', '5018 เซ็นทรัล รามอินทรา', '5019 เทอร์มินัล 21 อโศก', '5021 เซ็นทรัล ปิ่นเกล้า', '5023 บิ๊กซี พัทยาใต้', '5024 เดอะมอลล์ บางแค', '5026 IT หลักสี่', '5028 โลตัส ปทุมธานี', '5030 เพลินนารี่ มอลล์', '5031 เซ็นทรัล ศาลายา', '5033 โลตัส แจ้งวัฒนะ', '5034 โลตัส ศาลายา', '5035 เซ็นทรัลพัทยา บีช', '5036 โลตัส บางปะกอก', '5038 เซ็นทรัล ระยอง', '5039 เซ็นทรัล ชลบุรี', '5040 เซ็นทรัล Westgate', '5041 เซ็นทรัล พระราม3', '5042 ฟิวเจอร์ปาร์ค รังสิต', '5044 โลตัส ระยอง', '5045 Promenade', '5046 โลตัส บางกะปิ', '5049 โลตัส ชลบุรี', '5050 บิ๊กซี บางพลี', '5052 โลตัส นวนคร', '5054 บิ๊กซี บางใหญ่', '5055 โลตัส สุขาภิบาล 3', '5057 โลตัส รังสิต', '5061 บิ๊กซี สัตหีบ', '5062 โรบินสัน ชลบุรี', '5063 โลตัส พนัสนิคม', '5064 เทอร์มินอล พัทยา', '5065 เกตเวย์ เอกมัย', '5066 เกตเวย์ บางซื่อ', '5068 คอสโม บาร์ซา', '5069 โลตัส พัฒนาการ', '5070 พันทิพย์ งามวงศ์วาน', '5071 โลตัส จรัญสนิทวงศ์', '5072 โลตัส สุขาภิบาล 1', '5073 โลตัส ลาดพร้าว', '5074 บิ๊กซี พระราม 4', '5076 บิ๊กซี ติวานนท์', '5077 เทอมินัล โคราช', '5079 เซ็นทรัล โคราช', '5080 โลตัส แกลง ระยอง', '5081 โลตัส ติวานนท์', '5082 มาเก็ตเพลส วงศ์สว่างเซ็นเตอร์', '5084 เทอมินัล 21 พระราม 3', '5085 ICS ไอคอนสยาม', '5087 ศูนย์การประชุมแห่งชาติสิริกิติ์', '5088 สยาม สแควร์', '5090 S Oasis', '5091 ปตท.เกษรนวมินทร์', '5509 โลตัส นครอินทร์', '5505 โลตัสเลียบคลองสอง', '5504 โลตัสวังหิน', '5508 รพ.วชิระพยาบาล'];
+const TIME_OPTIONS = ["16.00", "สิ้นวัน"];
+const NUMERIC_IDS = ["plan_sale","actual_sale","sale_dine_in","sale_take_away","sale_grab","sale_lineman","sale_shopeefood","total_trans","trans_dine_in","trans_take_away","trans_grab","trans_lineman","trans_shopeefood","customer","labour_hour","labour_baht"];
+const REVIEW_LABELS = {
+  district_manager:"1.1 ผู้จัดการเขตที่รับผิดชอบ",
+  branch:"1.2 สาขา",
+  submit_date:"1.3 วันที่ส่งข้อมูล",
+  submit_time_slot:"1.4 ช่วงเวลาที่ทำการส่งข้อมูล",
+  plan_sale:"2.1 Plan Sale",
+  actual_sale:"2.2 Actual Sale",
+  sale_dine_in:"2.3 Dine In",
+  sale_take_away:"2.4 Take away",
+  sale_grab:"2.5 Grab",
+  sale_lineman:"2.6 Line Man",
+  sale_shopeefood:"2.7 Shopee Food",
+  total_trans:"3.1 Total Trans",
+  trans_dine_in:"3.2 Dine In",
+  trans_take_away:"3.3 Take away",
+  trans_grab:"3.4 Grab",
+  trans_lineman:"3.5 Line Man",
+  trans_shopeefood:"3.6 Shopee Food",
+  customer:"4.1 Customer",
+  labour_hour:"4.2 Labour (hour)",
+  labour_baht:"4.3 Labour (Baht)"
+};
+let __pendingPayload = null;
+let LAST_REQ_URL = "";
+
+function fillSelect(id, items, placeholder){
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.innerHTML = `<option value="">${placeholder || "— เลือก —"}</option>` + items.map(v => `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`).join("");
+}
+function escapeHtml(s){ return String(s ?? "").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m])); }
+function n0(v){ const n = Number(String(v ?? "").replace(/,/g,"").trim()); return Number.isFinite(n) ? n : 0; }
+function sanitizeNumeric(v){ return String(v ?? "").replace(/,/g,"").replace(/[^0-9.\-]/g,""); }
+function format2(v){ const n=n0(v); return n.toLocaleString("en-US", {minimumFractionDigits:2, maximumFractionDigits:2}); }
+function sleepMs_(ms){ return new Promise(r=>setTimeout(r, ms||0)); }
+function normalizeSlot_(slot){ const s=String(slot||"").trim(); if(s==="16"||s==="16:00") return "16.00"; return s; }
+function prevDateYMD_(ymd){
+  try {
+    const d = new Date(String(ymd).trim() + "T00:00:00+07:00");
+    d.setDate(d.getDate()-1);
+    const y=d.getUTCFullYear(), m=String(d.getUTCMonth()+1).padStart(2,"0"), day=String(d.getUTCDate()).padStart(2,"0");
+    return `${y}-${m}-${day}`;
+  } catch(_) { return ""; }
+}
+function formatThaiDateYMD_(ymd){
+  const s=String(ymd||"").trim();
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+  const [y,m,d]=s.split("-");
+  return `${d}/${m}/${y}`;
+}
+function formatThaiDateTime_(input){
+  if(!input) return "";
+  const d = new Date(input);
+  if(Number.isNaN(d.getTime())) return String(input);
+  return d.toLocaleString("th-TH", { timeZone:"Asia/Bangkok", year:"numeric", month:"2-digit", day:"2-digit", hour:"2-digit", minute:"2-digit" });
+}
+function getDupTimestampMs_(d){
+  if(d && typeof d.timestamp === "number") return d.timestamp;
+  if(d && d.timestampText) {
+    const parsed = new Date(String(d.timestampText).replace(" ","T") + "+07:00");
+    if(!Number.isNaN(parsed.getTime())) return parsed.getTime();
+  }
+  return null;
+}
+function showModal(type, title, lines, opts={}){
+  const modal=document.getElementById("modal"), titleEl=document.getElementById("modalTitle"), msgEl=document.getElementById("modalMsg"), btn=document.getElementById("modalBtn"), spinner=document.getElementById("modalSpinner");
+  titleEl.textContent = title || "";
+  const arr = Array.isArray(lines) ? lines : [String(lines||"")];
+  msgEl.innerHTML = arr.map(t=>`<div>${escapeHtml(String(t))}</div>`).join("");
+  spinner.style.display = opts.loading ? "block" : "none";
+  btn.style.display = opts.loading ? "none" : "block";
+  modal.classList.add("show");
+  modal.setAttribute("aria-hidden","false");
+}
+function hideModal(){
+  const modal=document.getElementById("modal");
+  modal.classList.remove("show");
+  modal.setAttribute("aria-hidden","true");
+}
+document.getElementById("modalBtn").addEventListener("click", hideModal);
+document.getElementById("modal").addEventListener("click", e=>{ if(e.target.id==="modal") hideModal(); });
+
+function attachNumericBehaviors(){
+  NUMERIC_IDS.forEach(id=>{
+    const el=document.getElementById(id);
+    if(!el) return;
+    el.addEventListener("input", ()=>{ el.value = el.value.replace(/,/g,"").replace(/[^0-9.]/g,""); });
+    el.addEventListener("blur", ()=>{ if(el.value.trim()!=="") el.value = format2(el.value); });
+  });
+}
+
+function cacheDefaultFieldState_(){
+  document.querySelectorAll("[data-lock16] input, [data-lock16] select").forEach(el=>{
+    if(!el.dataset.defaultRequired) el.dataset.defaultRequired = el.required ? "1" : "0";
+  });
+}
+function applyTimeSlotRulesUI_(){
+  const is16 = String(document.getElementById("submit_time_slot").value || "").trim() === "16.00";
+  document.querySelectorAll("[data-lock16]").forEach(wrap=>{
+    const el=wrap.querySelector("input,select");
+    if(!el) return;
+    wrap.classList.toggle("field-locked", is16);
+    el.disabled = is16;
+    el.required = !is16 && el.dataset.defaultRequired === "1";
+    if(is16) el.value = "";
+  });
+  if(is16){
+    ["labour_hour","labour_baht"].forEach(id=>{ const el=document.getElementById(id); if(el) el.value="0.00"; });
+  }
+}
+
+function postApiViaIframe(payload, timeoutMs){
+  return new Promise((resolve) => {
+    const reqId = "__api_req_" + Math.random().toString(36).slice(2) + "_" + Date.now();
+    const iframeName = "api_iframe_" + reqId;
+    const iframe = document.createElement("iframe");
+    iframe.name = iframeName;
+    iframe.style.display = "none";
+    const form = document.createElement("form");
+    form.method = "POST";
+    form.action = WEB_APP_URL;
+    form.target = iframeName;
+    form.style.display = "none";
+    const body = Object.assign({}, payload || {}, { _transport:"iframe", _reqId:reqId });
+    Object.keys(body).forEach(k => {
+      const input=document.createElement("input");
+      input.type="hidden"; input.name=k; input.value=body[k]==null ? "" : String(body[k]);
+      form.appendChild(input);
+    });
+    let done=false;
+    const cleanup=()=>{ try{window.removeEventListener("message", onMessage);}catch(_){} try{form.remove();}catch(_){} try{iframe.remove();}catch(_){} };
+    const finish=(data)=>{ if(done) return; done=true; cleanup(); resolve(data || {ok:false}); };
+    const timer=setTimeout(()=>finish({ok:false, timeout:true, transport:"iframe", url:WEB_APP_URL}), timeoutMs || 60000);
+    function onMessage(ev){
+      const d=ev && ev.data;
+      if(!d || d.source!=="santafe-sales-api" || d.reqId!==reqId) return;
+      clearTimeout(timer);
+      finish(d.payload || {ok:false, bridge_failed:true});
+    }
+    window.addEventListener("message", onMessage);
+    document.body.appendChild(iframe);
+    document.body.appendChild(form);
+    LAST_REQ_URL = WEB_APP_URL + " [iframe-post]";
+    try { form.submit(); } catch(err) { clearTimeout(timer); finish({ ok:false, submit_failed:true, error:String(err||"submit_failed") }); }
+  });
+}
+function apiCheckDup(payload, timeoutMs=45000){
+  return postApiViaIframe({
+    mode:"checkdup",
+    district_manager: payload?.district_manager || "",
+    branch: payload?.branch || "",
+    submit_date: payload?.submit_date || "",
+    submit_time_slot: payload?.submit_time_slot || ""
+  }, timeoutMs);
+}
+function apiSubmit(payload, timeoutMs=75000){
+  return postApiViaIframe(Object.assign({mode:"submit"}, payload || {}), timeoutMs);
+}
+function isBusyPeakRes_(res){
+  const code = String(res && res.code || "").trim().toUpperCase();
+  const err = String((res && (res.error || res.userMessage)) || "").toLowerCase();
+  return code === "BUSY_PEAK" || err.includes("acquire lock") || err.includes("busy");
+}
+
+function buildDuplicateModal_(dupObj, payload){
+  const d = dupObj || {};
+  const tsMs = getDupTimestampMs_(d);
+  const sentAt = formatThaiDateTime_(tsMs);
+  const who = String(d.submitter_name || "").trim() || String(payload?.submitter_name || "").trim();
+  const lines = [
+    "ข้อมูลรอบนี้ถูกส่งเรียบร้อยแล้ว",
+    "1.1 ผู้จัดการเขต: " + (d.district_manager || payload?.district_manager || "-"),
+    "1.2 สาขา: " + (d.branch || payload?.branch || "-"),
+    "1.3 วันที่ส่งข้อมูล: " + (d.submit_date || payload?.submit_date || "-"),
+    "1.4 ช่วงเวลา: " + (d.submit_time_slot || payload?.submit_time_slot || "-")
+  ];
+  if(sentAt) lines.push("ระบบได้รับข้อมูลเมื่อ " + sentAt + (who ? " โดย " + who : ""));
+  return { type:"success", title:"ระบบได้รับข้อมูลแล้ว", lines, opts:{ spacious:true } };
+}
+
+function buildApiErrorModal_(res, payload){
+  const r=res||{};
+  const code=String(r.code||"").trim();
+  const err=String(r.userMessage || r.error || "ส่งข้อมูลไม่สำเร็จ กรุณาลองใหม่").trim();
+  if(isBusyPeakRes_(r)){
+    return { type:"error", title:"ระบบกำลังมีการใช้งานสูง", lines:["⏳ ขณะนี้มีหลายสาขากำลังส่งข้อมูลพร้อมกัน","กรุณารอ 10–20 วินาที แล้วลองส่งใหม่อีกครั้ง"], opts:{spacious:true} };
+  }
+  if(code === "CHECKDUP_ERROR"){
+    return { type:"error", title:"เชื่อมต่อเซิร์ฟเวอร์ไม่ได้", lines:["ไม่สามารถตรวจสอบข้อมูลซ้ำได้","กรุณาลองใหม่อีกครั้ง"], opts:{spacious:true} };
+  }
+  if(code === "MUST_SEND_PREV_EOD_FIRST"){
+    const today = String(payload?.submit_date || "").trim();
+    const prev = String(r.requiredDate || "").trim() || prevDateYMD_(today);
+    return { type:"error", title:"ยังส่งรอบ 16.00 ไม่ได้", lines:[`ต้องส่งข้อมูลรอบ "สิ้นวัน" ของวันที่ ${formatThaiDateYMD_(prev) || prev || "-"} ก่อน`,`จากนั้นจึงส่งรอบ “16.00” ได้`], opts:{spacious:true} };
+  }
+  if(code === "MUST_SEND_1600_FIRST"){
+    return { type:"error", title:"ยังส่งรอบ สิ้นวัน ไม่ได้", lines:["ต้องส่งข้อมูลรอบ 16.00 ก่อน","จากนั้นจึงส่งรอบ สิ้นวัน ได้"], opts:{spacious:true} };
+  }
+  if(code === "LABOUR_HOUR_GE_BAHT"){
+    return { type:"error", title:"ส่งข้อมูลไม่สำเร็จ", lines:["⚠️ เงื่อนไขไม่ผ่าน: Labour (hour) ต้องน้อยกว่า Labour (Baht)","โปรดตรวจสอบตัวเลขอีกครั้ง แล้วลองส่งใหม่"], opts:{spacious:true} };
+  }
+  return { type:"error", title:"ส่งข้อมูลไม่สำเร็จ", lines:[err], opts:{spacious:true} };
+}
+
+async function doSend(payload, btn){
+  const payloadToSend={...payload};
+  try {
+    const dupRes = await apiCheckDup(payloadToSend);
+    if(!dupRes || dupRes.ok !== true) {
+      const m=buildApiErrorModal_(dupRes || {code:"CHECKDUP_ERROR"}, payloadToSend);
+      showModal(m.type,m.title,m.lines,m.opts);
+      return;
+    }
+    if(dupRes.duplicated) {
+      const m=buildDuplicateModal_(dupRes.duplicate||{}, payloadToSend);
+      showModal(m.type,m.title,m.lines,m.opts);
+      return;
+    }
+  } catch(_) {
+    const m=buildApiErrorModal_({code:"CHECKDUP_ERROR"}, payloadToSend);
+    showModal(m.type,m.title,m.lines,m.opts);
+    return;
+  }
+
+  NUMERIC_IDS.forEach(k=>{ if(payloadToSend[k] != null) payloadToSend[k]=sanitizeNumeric(payloadToSend[k]).trim(); });
+
+  try {
+    showModal("sending","กำลังส่งข้อมูล",["กรุณารอสักครู่..."],{loading:true});
+    let res = null;
+    for(let attempt=0; attempt<3; attempt++){
+      res = await apiSubmit(payloadToSend);
+
+      if(res && res.ok === true) break;
+
+      if(isBusyPeakRes_(res) && attempt < 2){
+        await sleepMs_(8000 + (attempt * 4000)); // 8s → 12s → 16s
+        showModal("sending","กำลังส่งข้อมูล",["ระบบกำลังลองส่งให้อีกครั้งอัตโนมัติ..."],{loading:true});
+        continue;
+      }
+      break;
+    }
+
+    if(res && res.duplicated){
+      const m=buildDuplicateModal_(res.duplicate||{}, payloadToSend);
+      showModal(m.type,m.title,m.lines,m.opts);
+      return;
+    }
+
+    if(res && res.timeout === true){
+      try {
+        const dup2 = await apiCheckDup(payloadToSend, 45000);
+        if(dup2 && dup2.ok === true && dup2.duplicated === true){
+          showModal("success","ข้อมูลรอบนี้ถูกส่งแล้ว",["✅ ระบบได้รับข้อมูลแล้ว","ไม่จำเป็นต้องกดส่งซ้ำ"],{spacious:true});
+          resetFormUI_();
+          return;
+        }
+      } catch(_) {}
+      showModal("error","ส่งข้อมูลไม่สำเร็จ",["การเชื่อมต่อช้า (timeout)","ตรวจสอบแล้วยังไม่พบข้อมูลในระบบ","กรุณากดส่งใหม่อีกครั้ง"]);
+      return;
+    }
+
+    if(!res || res.ok !== true){
+      const m=buildApiErrorModal_(res, payloadToSend);
+      showModal(m.type,m.title,m.lines,m.opts);
+      return;
+    }
+
+    showModal("success","ส่งข้อมูลเรียบร้อย",["ระบบได้รับข้อมูลแล้ว"],{spacious:true});
+    resetFormUI_();
+  } catch(err) {
+    showModal("error","ส่งข้อมูลไม่สำเร็จ",[String(err?.message||err)]);
+  } finally {
+    if(btn){ btn.disabled=false; btn.textContent="ตรวจสอบข้อมูล"; btn.dataset.locked="0"; }
+  }
+}
+
+function prettyValue(id, v){
+  const s=String(v ?? "").trim();
+  if(s==="") return "-";
+  if(NUMERIC_IDS.includes(id)) return format2(s);
+  return s;
+}
+function buildReviewContent(payload){
+  const name = String(document.getElementById("reviewReporter").value || "").trim();
+  payload.submitter_name = name;
+  const sections = [
+    { title:"ส่วนที่ 1: ข้อมูลทั่วไป", ids:["district_manager","branch","submit_date","submit_time_slot"] },
+    { title:"ส่วนที่ 2: Sale", ids:["plan_sale","actual_sale","sale_dine_in","sale_take_away","sale_grab","sale_lineman","sale_shopeefood"] },
+    { title:"ส่วนที่ 3: Trans", ids:["total_trans","trans_dine_in","trans_take_away","trans_grab","trans_lineman","trans_shopeefood"] },
+    { title:"ส่วนที่ 4: Customer & Labour", ids:["customer","labour_hour","labour_baht"] }
+  ];
+  document.getElementById("reviewContent").innerHTML = sections.map(sec => `
+    <div class="review-section">
+      <div class="review-section-title">${sec.title}</div>
+      <table class="review-table">
+        ${sec.ids.map(id => `<tr><th>${REVIEW_LABELS[id] || id}</th><td>${escapeHtml(prettyValue(id, payload[id]))}</td></tr>`).join("")}
+      </table>
+    </div>
+  `).join("");
+}
+function openReview(payload){ __pendingPayload = payload; buildReviewContent(payload); document.getElementById("reviewOverlay").classList.add("show"); }
+function closeReview(){ document.getElementById("reviewOverlay").classList.remove("show"); }
+
+document.getElementById("reviewBack").addEventListener("click", closeReview);
+document.getElementById("reviewReporter").addEventListener("input", ()=>{ if(__pendingPayload) buildReviewContent(__pendingPayload); });
+document.getElementById("reviewConfirm").addEventListener("click", async ()=>{
+  const btn=document.getElementById("btnSubmit");
+  if(!__pendingPayload) return;
+  const name=String(document.getElementById("reviewReporter").value || "").trim();
+  if(!name) {
+    showModal("error","ข้อมูลไม่ถูกต้อง",["กรุณากรอกชื่อผู้ลงข้อมูลก่อนยืนยันส่งข้อมูล"]);
+    return;
+  }
+  __pendingPayload.submitter_name = name.split(/\s+/)[0] || name;
+  closeReview();
+  if(btn){ btn.disabled=true; btn.textContent="กำลังตรวจสอบ..."; }
+  await doSend(__pendingPayload, btn);
+  __pendingPayload = null;
+});
+
+function resetFormUI_(){
+  document.getElementById("salesForm").reset();
+  fillSelect("district_manager", DM_OPTIONS, "— เลือกผู้จัดการเขต —");
+  fillSelect("branch", BRANCH_OPTIONS, "— เลือกสาขา —");
+  fillSelect("submit_time_slot", TIME_OPTIONS, "— เลือกช่วงเวลา —");
+  document.getElementById("branch").disabled = true;
+  applyTimeSlotRulesUI_();
+}
+
+document.getElementById("salesForm").addEventListener("submit", async (e)=>{
+  e.preventDefault();
+  const btn=document.getElementById("btnSubmit");
+  if(btn.dataset.locked === "1") return;
+  btn.dataset.locked = "1";
+  btn.disabled=true; btn.textContent="กำลังตรวจสอบ...";
+  const payload={};
+  document.querySelectorAll("#salesForm input, #salesForm select").forEach(el => payload[el.id]=el.value);
+
+  for(const k of ["district_manager","branch","submit_date","submit_time_slot"]) {
+    if(!String(payload[k] || "").trim()) {
+      showModal("error","กรุณากรอกข้อมูลให้ครบถ้วน",["กรุณากรอก/เลือกข้อมูลให้ครบถ้วน"]);
+      btn.disabled=false; btn.textContent="ตรวจสอบข้อมูล"; btn.dataset.locked="0";
+      return;
+    }
+  }
+
+  const is16 = String(payload.submit_time_slot||"").trim() === "16.00";
+  const LOCK_IDS_16 = ["sale_dine_in","sale_take_away","sale_grab","sale_lineman","sale_shopeefood","total_trans","trans_dine_in","trans_take_away","trans_grab","trans_lineman","trans_shopeefood","customer","labour_hour","labour_baht"];
+
+  if(is16){
+    if(!String(payload.plan_sale||"").trim() || !String(payload.actual_sale||"").trim()) {
+      showModal("error","กรุณากรอกข้อมูลให้ครบถ้วน",["กรุณากรอกข้อมูลในส่วนที่ 2 (เฉพาะ 2.1 Plan Sale และ 2.2 Actual Sale)"]);
+      btn.disabled=false; btn.textContent="ตรวจสอบข้อมูล"; btn.dataset.locked="0";
+      return;
+    }
+    const filledForbidden = LOCK_IDS_16.filter(id => n0(payload[id]) !== 0).map(id => REVIEW_LABELS[id] || id);
+    if(filledForbidden.length){
+      showModal("error","ข้อมูลไม่ถูกต้อง",["ช่วงเวลา 16.00 อนุญาตให้กรอกเฉพาะ 2.1 Plan Sale และ 2.2 Actual Sale เท่านั้น","กรุณาลบข้อมูลในช่อง: " + filledForbidden.join(", ")]);
+      btn.disabled=false; btn.textContent="ตรวจสอบข้อมูล"; btn.dataset.locked="0";
+      return;
+    }
+    btn.disabled=false; btn.textContent="ตรวจสอบข้อมูล"; btn.dataset.locked="0";
+    openReview(payload);
+    return;
+  }
+
+  if(!String(payload.actual_sale||"").trim() || !String(payload.sale_dine_in||"").trim()) {
+    showModal("error","กรุณากรอกข้อมูลให้ครบถ้วน",["กรุณากรอกข้อมูลในส่วนที่ 2 ให้ครบถ้วน"]);
+    btn.disabled=false; btn.textContent="ตรวจสอบข้อมูล";
+    return;
+  }
+
+  const missingPairFields = [];
+  if (n0(payload.sale_take_away) > 0 && n0(payload.trans_take_away) <= 0) missingPairFields.push("3.3 Take away");
+  if (n0(payload.trans_take_away) > 0 && n0(payload.sale_take_away) <= 0) missingPairFields.push("2.4 Take away");
+  if (n0(payload.sale_grab) > 0 && n0(payload.trans_grab) <= 0) missingPairFields.push("3.4 Grab");
+  if (n0(payload.trans_grab) > 0 && n0(payload.sale_grab) <= 0) missingPairFields.push("2.5 Grab");
+  if (n0(payload.sale_lineman) > 0 && n0(payload.trans_lineman) <= 0) missingPairFields.push("3.5 Line Man");
+  if (n0(payload.trans_lineman) > 0 && n0(payload.sale_lineman) <= 0) missingPairFields.push("2.6 Line Man");
+  if (n0(payload.sale_shopeefood) > 0 && n0(payload.trans_shopeefood) <= 0) missingPairFields.push("3.6 Shopee Food");
+  if (n0(payload.trans_shopeefood) > 0 && n0(payload.sale_shopeefood) <= 0) missingPairFields.push("2.7 Shopee Food");
+
+  if(missingPairFields.length){
+    const ordered = [...missingPairFields].sort((a,b)=>{ const pa=a.startsWith("2.")?2:3; const pb=b.startsWith("2.")?2:3; if(pa!==pb) return pa-pb; return parseFloat(a)||0 - (parseFloat(b)||0); });
+    showModal("error","ข้อมูลไม่ถูกต้อง", ordered.map(x=>`ขาดข้อมูลในข้อ ${x}`));
+    btn.disabled=false; btn.textContent="ตรวจสอบข้อมูล";
+    return;
+  }
+
+  const actual = n0(payload.actual_sale);
+  const s2 = n0(payload.sale_dine_in)+n0(payload.sale_take_away)+n0(payload.sale_grab)+n0(payload.sale_lineman)+n0(payload.sale_shopeefood);
+  const total = n0(payload.total_trans);
+  const t3 = n0(payload.trans_dine_in)+n0(payload.trans_take_away)+n0(payload.trans_grab)+n0(payload.trans_lineman)+n0(payload.trans_shopeefood);
+  const saleMismatch = Math.round(s2*100) !== Math.round(actual*100);
+  const transMismatch = Math.round(t3) !== Math.round(total);
+  const labourMismatch = !(n0(payload.labour_hour) < n0(payload.labour_baht));
+
+  if(saleMismatch || transMismatch || labourMismatch){
+    const rules = [
+      { bad:saleMismatch, msg:"ผลรวมของ Sale (Dine In + Take away + Delivery ต้องเท่ากับ Actual Sale)" },
+      { bad:transMismatch, msg:"ผลรวมของ Trans (Dine In + Take away + Delivery ต้องเท่ากับ Total Trans)" },
+      { bad:labourMismatch, msg:"4.2 Labour (hour) ต้องน้อยกว่า 4.3 Labour (Baht) เสมอ" }
+    ];
+    showModal("error","ใส่ข้อมูลไม่ถูกต้อง", rules.filter(r=>r.bad).map(r=>r.msg));
+    btn.disabled=false; btn.textContent="ตรวจสอบข้อมูล";
+    return;
+  }
+
+  btn.disabled=false; btn.textContent="ตรวจสอบข้อมูล";
+  openReview(payload);
+});
+
+document.addEventListener("DOMContentLoaded", ()=>{
+  fillSelect("district_manager", DM_OPTIONS, "— เลือกผู้จัดการเขต —");
+  fillSelect("branch", BRANCH_OPTIONS, "— เลือกสาขา —");
+  fillSelect("submit_time_slot", TIME_OPTIONS, "— เลือกช่วงเวลา —");
+  document.getElementById("district_manager").addEventListener("change", ()=>{ document.getElementById("branch").disabled = !document.getElementById("district_manager").value; });
+  document.getElementById("submit_time_slot").addEventListener("change", applyTimeSlotRulesUI_);
+  cacheDefaultFieldState_();
+  attachNumericBehaviors();
+  applyTimeSlotRulesUI_();
+});
+</script>
+
+
+
+<!-- === PATCH PACK (Requested) === -->
+<style>
+/* Time-slot 16.00 locks */
+.field-locked{ opacity: .55; }
+.field-locked:disabled{ cursor: not-allowed; }
+
+/* 1) Mobile: title up 20px */
+@media (max-width: 600px){
+  .brand-title{ transform: translateY(-20px) !important; }
+
+  /* 2) Mobile: lock version at top-right */
+  .brand{ position: relative !important; }
+  .brand-version{
+    position: absolute !important;
+    top: 10px !important;
+    right: 10px !important;
+    left: auto !important;
+    bottom: auto !important;
+    transform: none !important;
+    white-space: nowrap !important;
+    z-index: 20 !important;
+    pointer-events: none !important;
+  }
+}
+
+/* 3) Date input: width match other inputs (both) */
+#submit_date{
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* 4) Desktop: remove calendar icon + keep same style as selects */
+@media (min-width: 901px){
+  #submit_date{
+    background-image: none !important;
+    -webkit-appearance: auto !important;
+    appearance: auto !important;
+  }
+  #submit_date::-webkit-calendar-picker-indicator{
+    opacity: 1 !important; /* default on desktop */
+  }
+}
+
+/* 5) Mobile: keep black calendar icon (custom) */
+@media (max-width: 900px){
+  #submit_date{
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    height: 44px !important;
+    padding: 10px 40px 10px 16px !important;
+    font-size: 16px !important;
+    line-height: 24px !important;
+    border-radius: 14px !important;
+    border: 1px solid rgba(0,0,0,0.15) !important;
+    background-color: #fff !important;
+
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='26' viewBox='0 0 24 24'%3E%3Cpath fill='%23000000' d='M7 2a1 1 0 0 1 1 1v1h8V3a1 1 0 1 1 2 0v1h1a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3h1V3a1 1 0 0 1 1-1Zm12 8H5v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-9ZM6 6a1 1 0 0 0-1 1v1h14V7a1 1 0 0 0-1-1H6Z'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 12px center !important;
+    background-size: 22px 22px !important;
+  }
+
+  /* hide native icon but keep click area */
+  #submit_date::-webkit-calendar-picker-indicator{
+    opacity: 0 !important;
+    position: absolute !important;
+    right: 0 !important;
+    width: 46px !important;
+    height: 100% !important;
+    cursor: pointer !important;
+  }
+  #submit_date::-webkit-date-and-time-value{
+    text-align: center !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    line-height: 24px !important;
+    height: 24px !important;
+  }
+}
+
+/* ===============================
+   Android only – Header fix
+   =============================== */
+@media screen and (max-width: 480px) {
+
+  .container,
+  .main-container,
+  .card {
+    position: relative;
+  }
+
+  .page-title,
+  .header-title,
+  h1.title {
+    font-size: 16px;
+    line-height: 1.3;
+    max-width: 100%;
+    margin: 0 auto 10px auto;
+    padding: 0 12px;
+    text-align: center;
+    box-sizing: border-box;
+    word-break: break-word;
+    white-space: normal;
+  }
+}
+
+
+/* ===============================
+   ANDROID: tighten title to logo
+   =============================== */
+@media screen and (max-width: 480px) {
+
+  /* ลดช่องว่างระหว่างโลโก้กับหัวข้อ */
+  .header img,
+  .logo {
+    margin-bottom: 4px !important;
+  }
+
+  .header h1,
+  .page-title,
+  .header-title {
+    margin-top: 2px !important;   /* 👈 ชิดโลโก้ขึ้น */
+  }
+}
+
+
+/* ===============================
+   HEADER POSITION PER DEVICE
+   =============================== */
+
+/* ANDROID: ชิดโลโก้มากขึ้น */
+@media screen and (max-width: 480px) and (orientation: portrait) {
+  .header h1,
+  .page-title,
+  .header-title {
+    margin-top: -6px !important; /* ดันขึ้นชิดโลโก้จริง */
+  }
+}
+
+/* DESKTOP: ขยับหัวข้อไปขวา 30px */
+@media screen and (min-width: 1024px) {
+  .header h1,
+  .page-title,
+  .header-title {
+    position: relative;
+    left: 30px;
+  }
+}
+
+/* iOS (iPhone): ขยับหัวข้อไปซ้าย 20px */
+@supports (-webkit-touch-callout: none) {
+  @media screen and (max-width: 480px) {
+    .header h1,
+    .page-title,
+    .header-title {
+      position: relative;
+      left: -20px;
+    }
+  }
+}
+
+
+/* ===============================
+   HEADER: lock to real element (.brand-title)
+   Only moves the title; nothing else.
+   =============================== */
+
+/* Always neutralize the inline margin-left on the title (we will control per device) */
+.brand-title{ margin-left: 0 !important; }
+
+/* ANDROID: tighter to logo + centered inside white header */
+.is-android .brand-title{
+  text-align: center !important;
+}
+@media (max-width: 600px){
+  .is-android .brand-title{
+    transform: translateY(-34px) !important; /* 👈 ชิดโลโก้เพิ่ม */
+    margin-top: 0 !important;
+  }
+}
+
+/* DESKTOP: move title right 30px */
+@media (min-width: 901px){
+  .brand-title{
+    transform: translateX(30px) !important;
+  }
+}
+
+/* iPhone/iOS: move title left 20px */
+@media (max-width: 600px){
+  .is-ios .brand-title{
+    transform: translateX(-20px) translateY(-20px) !important;
+  }
+}
+
+
+/* ===============================
+   FINAL DEVICE TUNING (ONLY TITLE)
+   =============================== */
+
+/* reset any inline offset */
+.brand-title{ margin-left:0 !important; }
+
+/* ANDROID: move title closer to logo (vertical only) */
+@media (max-width:600px){
+  .is-android .brand-title{
+    transform: translateY(-46px) !important;
+  }
+}
+
+/* DESKTOP: keep right 30px (as confirmed OK) */
+@media (min-width:901px){
+  .brand-title{
+    transform: translateX(30px) !important;
+  }
+}
+
+/* iPhone/iOS: move title left 15px */
+@media (max-width:600px){
+  .is-ios .brand-title{
+    transform: translateX(-15px) translateY(-28px) !important;
+  }
+}
+
+
+/* ===============================
+   MICRO ADJUST FINAL
+   =============================== */
+
+/* iPhone: move title left 10px */
+@media (max-width:600px){
+  .is-ios .brand-title{
+    transform: translateX(-10px) translateY(-28px) !important;
+  }
+}
+
+/* Android: move title DOWN slightly (vertical only) */
+@media (max-width:600px){
+  .is-android .brand-title{
+    transform: translateY(-40px) !important; /* was -46, now down a bit */
+  }
+}
+
+
+/* ===============================
+   MOBILE: DISABLE LANDSCAPE
+   =============================== */
+
+/* Mobile landscape block */
+@media screen and (max-width: 900px) and (orientation: landscape) {
+  body > * {
+    display: none !important;
+  }
+  body::before {
+    content: "กรุณาใช้งานในแนวตั้ง (Portrait Mode)";
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    height: 100vh;
+    font-size: 18px;
+    font-weight: 600;
+    padding: 24px;
+    box-sizing: border-box;
+  }
+}
+
+
+/* ===============================
+   ANDROID MICRO TUNE: DOWN +5px
+   =============================== */
+@media (max-width:600px){
+  .is-android .brand-title{
+    transform: translateY(-35px) !important; /* was -40px */
+  }
+}
+
+
+/* ===============================
+   ANDROID FINAL TUNE: DOWN +10px
+   =============================== */
+@media (max-width:600px){
+  .is-android .brand-title{
+    transform: translateY(-25px) !important; /* was -35px */
+  }
+}
+
+
+/* ===============================
+   ANDROID FINAL TUNE: DOWN +20px
+   =============================== */
+@media (max-width:600px){
+  .is-android .brand-title{
+    transform: translateY(-5px) !important; /* was -25px */
+  }
+}
+
+
+/* ===============================
+   ANDROID FINAL TUNE: UP 15px
+   =============================== */
+@media (max-width:600px){
+  .is-android .brand-title{
+    transform: translateY(-20px) !important; /* was -5px */
+  }
+}
+
+</style>
+
+<script>
+/* 6) Date default: set 1.3 to today's date (both mobile + desktop) */
+(function(){
+  const el = document.getElementById('submit_date');
+  if (!el) return;
+  if (!el.value){
+    const d = new Date();
+    d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+    el.value = d.toISOString().slice(0,10);
+  }
+})();
+</script>
+
+
+<script>
+(function(){
+  async function ping(){
+    const el = document.getElementById('serverStatus');
+    if(!el) return;
+
+    try{
+      const data = await postApiViaIframe({ mode: "ping" }, 10000);
+      el.style.display = (data && data.ok === true) ? 'none' : 'block';
+    }catch(_){
+      el.style.display = 'block';
+    }
+  }
+
+  window.addEventListener('load', ping);
+})();</script>
+
+
+<!-- ✅ DM->Branch Filter (LOCKED) -->
+<script>
+const DM_BRANCH_MAP = {
+  "นิรุต เจริญศิลป์ (พี่รุต)": [
+    "5005 เดอะมอลล์ บางกะปิ",
+    "5010 แพชชั่น ระยอง",
+    "5019 เทอร์มินัล 21 อโศก",
+    "5038 เซ็นทรัล ระยอง",
+    "5044 โลตัส ระยอง",
+    "5046 โลตัส บางกะปิ",
+    "5055 โลตัส สุขาภิบาล 3",
+    "5065 เกตเวย์ เอกมัย",
+    "5074 บิ๊กซี พระราม 4",
+    "5080 โลตัส แกลง ระยอง",
+    "5088 สยาม สแควร์",
+  ],
+  "นพชัย จันทร์รุ่ง (พี่นพ)": [
+    "5001 แฟชั่น ไอส์แลนด์",
+    "5002 ซีคอนสแควร์ ศรีนครินทร์",
+    "5016 อิมพีเรียลเวิลด์ สำโรง",
+    "5041 เซ็นทรัล พระราม3",
+    "5045 Promenade",
+    "5069 โลตัส พัฒนาการ",
+    "5072 โลตัส สุขาภิบาล 1",
+    "5084 เทอมินัล 21 พระราม 3",
+    "5085 ICS ไอคอนสยาม",
+    "5087 ศูนย์การประชุมแห่งชาติสิริกิติ์",
+    "5091 ปตท.เกษรนวมินทร์",
+    "5505 โลตัสเลียบคลองสอง",
+  ],
+  "พัทธดนย์ วัฒนายุทธ (พี่ปิ๊ก)": [
+    "5003 เดอะมอลล์ ท่าพระ",
+    "5007 เซ็นทรัลพลาซา พระราม 2",
+    "5017 ซีคอน บางแค",
+    "5021 เซ็นทรัล ปิ่นเกล้า",
+    "5024 เดอะมอลล์ บางแค",
+    "5031 เซ็นทรัล ศาลายา",
+    "5034 โลตัส ศาลายา",
+    "5036 โลตัส บางปะกอก",
+    "5040 เซ็นทรัล Westgate",
+    "5054 บิ๊กซี บางใหญ่",
+    "5071 โลตัส จรัญสนิทวงศ์",
+    "5508 รพ.วชิระพยาบาล",
+  ],
+  "สีวิกา สังข์ด้วง (พี่เจี๊ยบ)": [
+    "5004 เซ็นทรัล รัตนาธิเบศร์",
+    "5011 เดอะมอลล์ งามวงศ์วาน",
+    "5028 โลตัส ปทุมธานี",
+    "5042 ฟิวเจอร์ปาร์ค รังสิต",
+    "5052 โลตัส นวนคร",
+    "5057 โลตัส รังสิต",
+    "5066 เกตเวย์ บางซื่อ",
+    "5070 พันทิพย์ งามวงศ์วาน",
+    "5076 บิ๊กซี ติวานนท์",
+    "5082 มาเก็ตเพลส วงศ์สว่างเซ็นเตอร์",
+    "5509 โลตัส นครอินทร์",
+  ],
+  "อนุรักษ์ สอนภักดี (พี่เอ็ม)": [
+    "5012 โลตัส บางพลี",
+    "5018 เซ็นทรัล รามอินทรา",
+    "5026 IT หลักสี่",
+    "5030 เพลินนารี่ มอลล์",
+    "5033 โลตัส แจ้งวัฒนะ",
+    "5050 บิ๊กซี บางพลี",
+    "5068 คอสโม บาร์ซา",
+    "5073 โลตัส ลาดพร้าว",
+    "5081 โลตัส ติวานนท์",
+    "5090 S Oasis",
+    "5504 โลตัสวังหิน",
+  ],
+  "ศุกร์แสง วัฒนาฟุ้งเจริญ (พี่หยี)": [
+    "5014 บิ๊กซี พัทยากลาง",
+    "5015 แปซิฟิกพาร์ค ศรีราชา",
+    "5023 บิ๊กซี พัทยาใต้",
+    "5035 เซ็นทรัลพัทยา บีช",
+    "5039 เซ็นทรัล ชลบุรี",
+    "5049 โลตัส ชลบุรี",
+    "5061 บิ๊กซี สัตหีบ",
+    "5062 โรบินสัน ชลบุรี",
+    "5063 โลตัส พนัสนิคม",
+    "5064 เทอร์มินอล พัทยา",
+  ],
+  "ณธวรรท  ศิริเมธานณ (พี่บิ๊ก)": [
+    "5077 เทอมินัล โคราช",
+    "5079 เซ็นทรัล โคราช",
+  ],
+};
+
+(function() {
+  function byId(id) { return document.getElementById(id); }
+
+  function ensurePlaceholder(sel, text) {
+    if (!sel) return;
+    let ph = sel.querySelector('option[value=""]');
+    if (!ph) {
+      ph = document.createElement('option');
+      ph.value = "";
+      ph.textContent = text;
+      sel.insertBefore(ph, sel.firstChild);
+    } else {
+      ph.textContent = text;
+    }
+  }
+
+  function resetBranch(brSel) {
+    if (!brSel) return;
+    brSel.innerHTML = "";
+    const ph = document.createElement('option');
+    ph.value = "";
+    ph.textContent = "— เลือกสาขา —";
+    brSel.appendChild(ph);
+    brSel.value = "";
+    brSel.disabled = true;
+  }
+
+  function fillBranch(dm, brSel) {
+    resetBranch(brSel);
+    const list = DM_BRANCH_MAP[dm] || [];
+    list.forEach(function(branch) {
+      const opt = document.createElement("option");
+      opt.value = branch;
+      opt.textContent = branch;
+      brSel.appendChild(opt);
+    });
+    brSel.disabled = false;
+  }
+
+  document.addEventListener("DOMContentLoaded", function() {
+    const dmSel = byId("district_manager");
+    const brSel = byId("branch");
+
+    ensurePlaceholder(dmSel, "— เลือกผู้จัดการเขต —");
+    ensurePlaceholder(brSel, "— เลือกสาขา —");
+
+    // 🔒 บังคับให้เริ่มต้นต้องเลือก DM ก่อน
+    if (dmSel) dmSel.value = "";
+    resetBranch(brSel);
+
+    if (dmSel) {
+      dmSel.addEventListener("change", function() {
+        const dm = (dmSel.value || "").trim();
+        if (!dm) return resetBranch(brSel);
+        fillBranch(dm, brSel);
+      });
+    }
+  });
+})();
+</script>
+
+</body>
+</html>
+
+
